@@ -19,23 +19,30 @@ app.use(cookieParser());
  */
 const Schema = mongoose.Schema;
 // TODO: change schemas here as needed
-const ItemSchema = new Schema({
-    title: String,
-    description: String,
-    image: String,
-    price: Number,
-    stat: String
+const BoardSchema = new Schema({
+    moveNumber: Number,
+    nextPlayerTurn: Number,
+    boardState: [[]]
+});
+
+const MatchSchema = new Schema({
+    player1Name: String,
+    player2Name: String,
+    player1Rating: Number,
+    player2Rating: Number,
+    winner: Number,
+    boardStates: []
 });
 
 const UserSchema = new Schema({
     username: String,
     password: String,
-    listings: [],
-    purchases: []
+    matches: []
 });
 
-var Item = mongoose.model('Item', Schema1);
-var User = mongoose.model('User', Schema2);
+var Board = mongoose.model('Board', BoardSchema);
+var Match = mongoose.model('Match', MatchSchema);
+var User = mongoose.model('User', UserSchema);
 
 /**
  * This function is a middleware function that authenticates a user by checking their cookie.
