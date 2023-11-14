@@ -1,0 +1,25 @@
+body {
+    margin: auto;
+    text-align: center;
+    font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    font-size: large;
+    color: black;
+    background-color: #c8fadd;
+}
+
+h1 {
+    color: rgb(6, 199, 119);
+    font-size: xxx-large;
+}
+
+.input_pair,
+.submit_button {
+    display: block;
+    margin-bottom: 1vh;
+    margin-top: 1vh;
+}
+
+.center_login_buttons {
+    width: 10%;
+    margin: auto;
+}
