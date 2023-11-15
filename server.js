@@ -142,7 +142,7 @@ function attemptUserLogin(req, res) {
                     let sid = addSession(u.username);
                     res.cookie("login",
                         { username: u.username, sessionID: sid },
-                        { maxAge: 80000 * 2 });
+                        { maxAge: 120000 });	// 2 minutes, to match the session length
                     res.end('SUCCESS');
                 }
                 else {
@@ -165,8 +165,7 @@ function registerNewUser(req, res) {
                 let u = new User({
                     username: userData.username,
                     password: hash,
-                    listings: [],
-                    purchases: []
+                    matches: []
                 });
             });
             let p = u.save();
@@ -181,3 +180,23 @@ function registerNewUser(req, res) {
         }
     });
 }
+
+function logoutUser(req, res) {
+	let userData = req.body;
+    let p1 = User.find({ username: userData.username }).exec();
+    p1.then((results) => {
+		if(results.length != 0){
+			let user = results[0];
+			delete sessions[user];
+			res.redirect('/index.html');
+		}
+		else
+			res.end('USER DOES NOT EXIST')
+	});
+}
+
+
+
+
+
+
