@@ -71,9 +71,9 @@ function PlayButton({opponent}){
 	function handleClick(){
 		// TODO: determine what kind of match later
 		if({opponent} == "AI")
-			navigate('/match');;
+			navigate('/match');
 		else
-			navigate('/match');;
+			navigate('/match');
 	}
 	return (
 		<button id={"play"+opponent+"Button"} className="playButton" onClick={handleClick}>
