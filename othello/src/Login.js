@@ -3,7 +3,40 @@ import React from 'react';
 function Login() {
     return (
         <div>
-            <h1>Test Login Page</h1>
+            <h1>Othello</h1>
+
+            <h1>Login</h1>
+            <div class="input_pair">
+                <label for="username">Username</label>
+                <input type="text" name="username" id="username" class="inputs" />
+            </div>
+
+            <div class="input_pair">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" class="inputs" />
+            </div>
+
+            {/*TODO change onclick function to new login function*/}
+            <div class="center_login_buttons">
+                <button id="login_button" onclick="attemptLogin();" class="submit_button">Login</button>
+            </div>
+
+            <h1>Create Account</h1>
+            <div class="input_pair">
+                <label for="username">Username</label>
+                <input type="text" name="create_username" id="create_username" class="inputs" />
+            </div>
+
+            <div class="input_pair">
+                <label for="password">Password</label>
+                <input type="password" name="create_password" id="create_password" class="inputs"
+                    pattern=".{8,}" title="Eight or more characters" required />
+            </div>
+
+            {/*TODO change onclick function to new add user function*/}
+            <div class="center_login_buttons">
+                <button id="add_user_button" onclick="addNewUser();" class="submit_button">Create</button>
+            </div>
         </div>
     );
 }
