@@ -1,5 +1,4 @@
 import React from 'react';
-import './Home.css';
 
 function getUser(){
 	let cookie = decodeURIComponent(document.cookie);

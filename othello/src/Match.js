@@ -1,6 +1,7 @@
 import React from 'react';
-
 import { useState } from 'react';
+
+import Default, {Header, BackButton} from './Components'
 
 function Square({ value, onSquareClick }) {
   return (
@@ -33,7 +34,7 @@ function Board({ xIsNext, squares, onPlay }) {
   }
 
   return (
-    <>
+    <div>
       <div className="status">{status}</div>
       <div className="board-row">
         <Square value={squares[0]} onSquareClick={() => handleClick(0)} />
@@ -50,7 +51,7 @@ function Board({ xIsNext, squares, onPlay }) {
         <Square value={squares[7]} onSquareClick={() => handleClick(7)} />
         <Square value={squares[8]} onSquareClick={() => handleClick(8)} />
       </div>
-    </>
+    </div>
   );
 }
 
@@ -85,13 +86,21 @@ function Match() {
     });
 
     return (
-        <div className="game">
-        <div className="game-board">
-            <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
-        </div>
-        <div className="game-info">
-            <ol>{moves}</ol>
-        </div>
+        <div>
+          <BackButton />
+          <Header value='Match' />
+          <div className=' game_container centered_container'>
+            <div className='game_wrapper centered_section'>
+              <div className="game">
+                <div className="game_board">
+                    <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
+                </div>
+                <div className="game-info">
+                    <ol>{moves}</ol>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
     );
 }

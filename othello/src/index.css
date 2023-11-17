@@ -43,6 +43,17 @@ h1 {
   width: 3vw;
 }
 
+.back_button_wrapper {
+  position: fixed;
+  left: 1vw;
+  top: 2.5vh;
+}
+
+.back_button {
+  width: 2.5vw;
+  height: 3vh;
+}
+
 label {
   margin-right: 0.5vw;
 }
@@ -63,11 +74,32 @@ label {
 
 
 
-.center_login_buttons {
+.center_login_buttons, .replay {
   display: flex;
   align-items: center;
   justify-content: center;
 }
+
+.replay {
+  padding-top: 1vh;
+  padding-bottom: 1vh;
+}
+
+.replay_details, .player_details {
+  margin-right: 1vw;
+}
+
+.replay_image {
+  object-fit: contain;
+}
+
+.replay:nth-child(odd) {
+  background-color:rgb(41, 43, 40);
+ }
+
+ .replay:nth-child(even) {
+  background-color:rgb(57, 59, 56);
+ }
 
 .square {
   background: #fff;
@@ -93,6 +125,7 @@ label {
 .status {
   margin-bottom: 10px;
 }
+
 .game {
   display: flex;
   flex-direction: row;

@@ -1,20 +1,15 @@
 import React from 'react';
-
-function ProfileHeader () {
-    return (
-        <div id='profile_header' className='main_header'>
-            <h1>Profile</h1>
-        </div>
-    );
-}
+import Default, {Header, BackButton} from './Components'
 
 function PlayerSection() {
     return (
         <div id='player_section'>
             <h2>Player Information</h2>
             <h3 id='player_name'>Player Name</h3>
-            <p id='player_rating' className='player_details'>rating</p>
-            <p id='matches_played' className='player_details'>x matches played</p>
+            <div id='player_details_container' className='centered_container'>
+                <p id='player_rating' className='player_details centered_section'><b>Rating:</b> x</p>
+                <p id='matches_played' className='player_details centered_section'><b>Matches played:</b> x</p>
+            </div>
         </div>
     );
 }
@@ -38,6 +33,8 @@ function Replay() {
     return (
         //TODO set up onclick for replays to go to respective replay on page.
         <div className='replay centered_container' /*onclick={}*/>
+            <img src={require('./images/replay.png')} alt='A replay symbol'
+                className='replay_details replay_image centered_section' width='50' />
             <p className='replay_details centered_section'><b>Players:</b> ?, ?</p>
             <p className='replay_details centered_section'><b>Average rating:</b> ?</p>
             <p className='replay_details centered_section'><b>Winner:</b> ?</p>
@@ -47,7 +44,8 @@ function Replay() {
 function Profile() {
     return (
         <div>
-            <ProfileHeader />
+            <BackButton />
+            <Header value='Profile' />
             <PlayerSection />
             <ReplaySection />
         </div>

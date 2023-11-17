@@ -1,12 +1,6 @@
 import React from 'react';
+import Default, {Header} from './Components'
 
-function LoginHeader() {
-    return (
-        <div id='login_header' className='main_header'>
-            <h1>Othello</h1>
-        </div>
-    );
-}
 function InputPair({id, value, type}) {
     return (
         <div className='input_pair'>
@@ -36,8 +30,8 @@ function LoginButton({id, onButtonClick, value}) {
 function Login() {
     return (
         <div>
-            <LoginHeader />
-            
+            <Header value='Othello' />
+
             <div className='centered_container'>
                 <div className='login_section centered_section'>
                     <h1>Login</h1>
