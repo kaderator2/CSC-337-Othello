@@ -1,6 +1,8 @@
 import React from 'react';
 import {useNavigate} from "react-router-dom"
 
+const navigate = useNavigate();
+
 function getUser(){
 	let cookie = decodeURIComponent(document.cookie);
 	let currentUser;
