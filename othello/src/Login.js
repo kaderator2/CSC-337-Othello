@@ -1,5 +1,12 @@
 import React from 'react';
 
+function LoginHeader() {
+    return (
+        <div id='login_header' className='main_header'>
+            <h1>Othello</h1>
+        </div>
+    );
+}
 function InputPair({id, value, type}) {
     return (
         <div className='input_pair'>
@@ -29,10 +36,10 @@ function LoginButton({id, onButtonClick, value}) {
 function Login() {
     return (
         <div>
-            <h1>Othello</h1>
-
-            <div id='login_container'>
-                <div className='login_section'>
+            <LoginHeader />
+            
+            <div className='centered_container'>
+                <div className='login_section centered_section'>
                     <h1>Login</h1>
                     <InputPair name='username' value='Username' type='text' />
                     <InputPair name='password' value='Password' type='password' />
@@ -40,7 +47,7 @@ function Login() {
                     {/*TODO change onclick function to new login function*/}
                     <LoginButton id='login_button' /*onclick={() => attemptLogin()}*/ value='Log In' />
                 </div>
-                <div className='login_section'>
+                <div className='login_section centered_section'>
                     <h1>Create Account</h1>
                     <InputPair name='create_username' value='Username' type='text' />
                     <PasswordPair name='create_password' value='Password' />

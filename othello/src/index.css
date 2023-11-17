@@ -1,10 +1,10 @@
 body {
-  margin: auto;
+  margin: 0px;
   text-align: center;
   font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
   font-size: large;
-  color: black;
-  background-color: #c8fadd;
+  color: #ffffff;
+  background-color: rgb(57, 59, 56);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -18,8 +18,17 @@ code {
   box-sizing: border-box;
 }
 
+.main_header {
+  background-color: #2c302d;
+  padding-top: 2vh;
+  padding-bottom: 2vh;
+}
+h1, h2, h3 {
+  color: #8df0c2;;
+}
+
 h1 {
-  color: rgb(6, 199, 119);
+  margin: 0;
   font-size: xxx-large;
 }
 
@@ -38,7 +47,7 @@ label {
   margin-right: 0.5vw;
 }
 
-#login_container {
+.centered_container {
   text-align: center;
 }
 
@@ -46,8 +55,13 @@ label {
   margin-left: 8vw;
   margin-right: 8vw;
   margin-top: 8vh;
+}
+
+.centered_section {
   display: inline-block;
 }
+
+
 
 .center_login_buttons {
   display: flex;
