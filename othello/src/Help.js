@@ -7,7 +7,7 @@ function ReturnButton({id}){
         navigate('/home');
     }	
 	return (
-		<button id={id} className="returnButton" onClick={goToHome}> Return to Home </button>
+		<button id={id} className="returnButton" onClick={goToHome}> Return Home </button>
 	);
 }
 
@@ -38,6 +38,7 @@ function Help() {
 			or find patterns in gameplay. </p>
 			<br></br>
 			<ReturnButton id='helpReturn'/>
+			<br></br>
         </div>
     );
 }

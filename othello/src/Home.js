@@ -1,5 +1,6 @@
 import React from 'react';
 import {useNavigate} from "react-router-dom";
+import { ProfilePicture, NavButton } from './Components';
 
 function getUser(){
 	let cookie = decodeURIComponent(document.cookie);
@@ -45,9 +46,16 @@ function LogoutButton(){
 			console.log('Error sending logout request');
 			console.log(error);
 		});
-	}	
+	}
+	
+	{/*Temporary*/}
+	let navigate = useNavigate();
+	const goToLogin = () => { 
+        navigate('/');
+    }
+		
 	return (
-		<button id="logoutButton" onClick={handleClick}> Log out </button>
+		<button id="logoutButton" onClick={goToLogin}> Log out </button>
 	);
 }
 
@@ -84,12 +92,6 @@ function Logo({src, id}){
 	);
 }
 
-function ProfilePicture({id, size, src}){
-	return(
-		<img src={src} id={id} className="pfp" style={{width:size, height:size}}></img>
-	);
-}
-
 function SidePanel({id}){
 	return (
         <div id={id}>
@@ -114,7 +116,7 @@ function MainHome({id}){
 function Home() {
     return (
         <div id='Home'>
-            <h1 id='welcome'>Welcome {getUser()}!</h1>
+            <h1 id='welcome'>Welcome {/*getUser()*/}!</h1>
             <MainHome id='mainHome' />
             <SidePanel id='sidePanel' />
         </div>
