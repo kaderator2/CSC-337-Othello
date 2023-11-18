@@ -182,6 +182,19 @@ label {
   left:20px;
   bottom:10px;
 }
+
+.arrow_container {
+  position: absolute;
+}
+
+#replay_forward {
+  right: 40vw;
+}
+
+#replay_back {
+  left: 40vw;
+}
+
 /* styling for Home */
 
 #mainHome{
