@@ -22,4 +22,22 @@ export function BackButton() {
     );
 }
 
+export function NavButton({path, value, id}){
+	let navigate = useNavigate();
+	const goTo = () => { 
+		let navTo = {path};
+        navigate({navTo});
+    }
+	return (
+		<button id={id} className='navButton' onClick={goTo}> {value} </button>
+	);
+}
+
+export function ProfilePicture({id, size, src}){
+	return(
+		// eslint-disable-next-line jsx-a11y/alt-text
+		<img src={src} id={id} className="pfp" style={{width:size, height:size}}></img>
+	);
+}
+
 export default Header("test");
