@@ -1,14 +1,13 @@
 import React from 'react';
-import {useNavigate} from "react-router-dom"
-
-const navigate = useNavigate();
+import {useNavigate} from "react-router-dom";
 
 function ReturnButton({id}){
-	function handleClick(){
-		navigate('/home');
-	}	
+    let navigate = useNavigate();
+    const goToHome = () => { 
+        navigate('/home');
+    }	
 	return (
-		<button id={id} className="returnButton" onClick={handleClick}> Return to Home </button>
+		<button id={id} className="returnButton" onClick={goToHome}> Return to Home </button>
 	);
 }
 

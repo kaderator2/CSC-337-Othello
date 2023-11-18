@@ -1,7 +1,5 @@
 import React from 'react';
-import {useNavigate} from "react-router-dom"
-
-const navigate = useNavigate();
+import {useNavigate} from "react-router-dom";
 
 function getUser(){
 	let cookie = decodeURIComponent(document.cookie);
@@ -23,11 +21,13 @@ function getUser(){
 }
 
 function HelpButton(){
-	function handleClick(){
-		navigate('/help');
-	}	
+	let navigate = useNavigate();
+	const goToHelp = () => { 
+        navigate('/help');
+    }
+
 	return (
-		<button id="helpButton" onClick={handleClick}> ? </button>
+		<button id="helpButton" onClick={goToHelp}> ? </button>
 	);
 }
 
@@ -52,33 +52,28 @@ function LogoutButton(){
 }
 
 function ProfileButton(){
-	function handleClick(){
-		navigate('/profile');;
-	}
+	let navigate = useNavigate();
+	const goToProfile = () => { 
+        navigate('/profile');
+    }
 	return (
-		<button id="profileButton" onClick={handleClick}> Profile </button>
-	);
-}
-
-function ReplayButton(){
-	function handleClick(){
-		navigate('/replay');;
-	}
-	return (
-		<button id="replayButton" onClick={handleClick}> Game History </button>
+		<button id="profileButton" onClick={goToProfile}> Profile </button>
 	);
 }
 
 function PlayButton({opponent}){
-	function handleClick(){
-		// TODO: determine what kind of match later
-		if({opponent} == "AI")
+	let navigate = useNavigate();
+	const goToMatch = () => { 
+        // TODO: determine what kind of match later
+		if({opponent} == "AI") {
 			navigate('/match');
-		else
+		}
+		else {
 			navigate('/match');
+		}
 	}
 	return (
-		<button id={"play"+opponent+"Button"} className="playButton" onClick={handleClick}>
+		<button id={"play"+opponent+"Button"} className="playButton" onClick={goToMatch}>
 		 Play vs {opponent} </button>
 	);
 }
@@ -100,7 +95,6 @@ function SidePanel({id}){
         <div id={id}>
             <ProfilePicture id="homePFP" src="" size="50px"/>  {/* Temp size and src */}
             <ProfileButton/>
-            <ReplayButton/>
             <LogoutButton/>
         </div>
     );

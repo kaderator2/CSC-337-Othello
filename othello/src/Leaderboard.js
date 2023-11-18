@@ -1,8 +1,6 @@
 import React from 'react';
-import {useNavigate} from "react-router-dom"
+import {useNavigate} from "react-router-dom";
 import ReturnButton from './Help';
-
-const navigate = useNavigate();
 
 function RankTable({list}){
 	return (
