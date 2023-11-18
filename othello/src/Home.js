@@ -1,4 +1,7 @@
 import React from 'react';
+import {useNavigate} from "react-router-dom"
+
+const navigate = useNavigate();
 
 function getUser(){
 	let cookie = decodeURIComponent(document.cookie);
@@ -21,7 +24,7 @@ function getUser(){
 
 function HelpButton(){
 	function handleClick(){
-		window.location.href = '/help';
+		navigate('/help');
 	}	
 	return (
 		<button id="helpButton" onClick={handleClick}> ? </button>
@@ -50,10 +53,19 @@ function LogoutButton(){
 
 function ProfileButton(){
 	function handleClick(){
-		window.location.href = '/profile';
+		navigate('/profile');;
 	}
 	return (
-		<button id="profileButton" onClick={handleClick}> Profile / Recent Games </button>
+		<button id="profileButton" onClick={handleClick}> Profile </button>
+	);
+}
+
+function ReplayButton(){
+	function handleClick(){
+		navigate('/replay');;
+	}
+	return (
+		<button id="replayButton" onClick={handleClick}> Game History </button>
 	);
 }
 
@@ -61,9 +73,9 @@ function PlayButton({opponent}){
 	function handleClick(){
 		// TODO: determine what kind of match later
 		if({opponent} == "AI")
-			window.location.href = '/Match';
+			navigate('/match');
 		else
-			window.location.href = '/Match';
+			navigate('/match');
 	}
 	return (
 		<button id={"play"+opponent+"Button"} className="playButton" onClick={handleClick}>
@@ -88,6 +100,7 @@ function SidePanel({id}){
         <div id={id}>
             <ProfilePicture id="homePFP" src="" size="50px"/>  {/* Temp size and src */}
             <ProfileButton/>
+            <ReplayButton/>
             <LogoutButton/>
         </div>
     );
