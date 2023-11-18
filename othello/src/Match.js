@@ -1,7 +1,7 @@
 import React from 'react';
 import { useState } from 'react';
 
-import Default, {Header, BackButton} from './Components'
+import Default, {Header, BackButton, PlayerData} from './Components'
 
 function Square({ value, onSquareClick }) {
   return (
@@ -89,8 +89,10 @@ function Match() {
         <div>
           <BackButton />
           <Header value='Match' />
-          <div className=' game_container centered_container'>
-            <div className='game_wrapper centered_section'>
+          <div className='match_container centered_container'>
+            <div className='game_container centered_section'>
+              <PlayerData id='top_player' name='test' rating='1400' />
+              <PlayerData id='bottom_player' name='test2' rating='1450' />
               <div className="game">
                 <div className="game_board">
                     <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />

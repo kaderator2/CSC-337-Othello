@@ -73,9 +73,7 @@ label {
   display: inline-block;
 }
 
-
-
-.center_login_buttons, .replay {
+.center_login_buttons, .replay, .player_data {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -90,7 +88,7 @@ label {
   margin-right: 1vw;
 }
 
-.replay_image {
+.image_contain {
   object-fit: contain;
 }
 
@@ -101,6 +99,14 @@ label {
  .replay:nth-child(even) {
   background-color:rgb(57, 59, 56);
  }
+
+.game_container {
+  position:relative;
+  margin-top: 5vh;
+  border: 5px solid black;
+  width: 70vh;
+  height: 70vh;
+}
 
 .square {
   background: #fff;
@@ -128,6 +134,10 @@ label {
 }
 
 .game {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateY(-50%) translateX(-50%);
   display: flex;
   flex-direction: row;
 }
@@ -136,6 +146,42 @@ label {
   margin-left: 20px;
 }
 
+.player_data {
+  position: absolute;
+  height:85px;
+}
+
+.match_player_wrapper {
+  margin-left:10px;
+}
+
+.match_player_wrapper * {
+  
+  margin: 0;
+}
+
+.match_pfp {
+  margin: 0;
+  display: inline-block;
+  width: 75px;
+  height: 75px;
+  border-radius: 50%;
+  border: 5px solid black;
+
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+}
+
+#top_player {
+  right:20px;
+  top:10px;
+}
+
+#bottom_player {
+  left:20px;
+  bottom:10px;
+}
 /* styling for Home */
 
 #mainHome{

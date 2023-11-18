@@ -40,4 +40,27 @@ export function ProfilePicture({id, size, src}){
 	);
 }
 
+export function PlayerData({id, name, rating, pfp}) {
+    if(pfp) {
+        var divStyles = {
+            backgroundImage:'url(' + require(pfp) + ')'
+        };
+    }
+    else {
+        var divStyles = {
+            backgroundImage:'url(' + require('./images/default_pfp.jpg') + ')',
+        };
+    }
+    return (
+        <div id={id} className='player_data centered_container'>
+            <div className='match_pfp image_contain centered_section' style={divStyles}>
+            </div>
+            <div className='match_player_wrapper centered_section'>
+                <h3>{name}</h3>
+                <p>{rating}</p>
+            </div>
+        </div>
+    );
+}
+
 export default Header("test");

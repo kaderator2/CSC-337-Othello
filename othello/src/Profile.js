@@ -1,5 +1,6 @@
 import React from 'react';
 import Default, {Header, BackButton} from './Components'
+import { useNavigate } from "react-router-dom";
 
 function PlayerSection() {
     return (
@@ -30,11 +31,15 @@ function ReplaySection() {
 }
 
 function Replay() {
+    let navigate = useNavigate();
+    const goToReplay = () => { 
+        navigate('/replay');
+        //TODO implement sending data about specific replay
+    }
     return (
-        //TODO set up onclick for replays to go to respective replay on page.
-        <div className='replay centered_container' /*onclick={}*/>
+        <div className='replay centered_container' onClick={goToReplay}>
             <img src={require('./images/replay.png')} alt='A replay symbol'
-                className='replay_details replay_image centered_section' width='50' />
+                className='replay_details image_contain centered_section' width='50' />
             <p className='replay_details centered_section'><b>Players:</b> ?, ?</p>
             <p className='replay_details centered_section'><b>Average rating:</b> ?</p>
             <p className='replay_details centered_section'><b>Winner:</b> ?</p>
