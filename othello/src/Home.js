@@ -1,6 +1,6 @@
 import React from 'react';
 import {useNavigate} from "react-router-dom";
-import { ProfilePicture, NavButton } from './Components';
+import { ProfilePicture, Header } from './Components';
 
 function getUser(){
 	let cookie = decodeURIComponent(document.cookie);
@@ -69,6 +69,16 @@ function ProfileButton(){
 	);
 }
 
+function LeaderboardButton(){
+	let navigate = useNavigate();
+	const goToLB = () => { 
+        navigate('/leaderboard');
+    }
+	return (
+		<button id="lbButton" onClick={goToLB}> Leaderboard </button>
+	);
+}
+
 function PlayButton({opponent}){
 	let navigate = useNavigate();
 	const goToMatch = () => { 
@@ -96,7 +106,9 @@ function SidePanel({id}){
 	return (
         <div id={id}>
             <ProfilePicture id="homePFP" src="" size="50px"/>  {/* Temp size and src */}
+            <br></br>
             <ProfileButton/>
+            <br></br>
             <LogoutButton/>
         </div>
     );
@@ -107,8 +119,12 @@ function MainHome({id}){
         <div id={id}>
             <HelpButton/>
             <Logo src="" id="homeLogo"/>
+            <br></br>
             <PlayButton opponent="Player" />
+            <br></br>
             <PlayButton opponent="AI" />
+            <br></br>
+            <LeaderboardButton />
         </div>
     );
 }
@@ -116,7 +132,7 @@ function MainHome({id}){
 function Home() {
     return (
         <div id='Home'>
-            <h1 id='welcome'>Welcome {/*getUser()*/}!</h1>
+            <Header value='Welcome to Othello !' />
             <MainHome id='mainHome' />
             <SidePanel id='sidePanel' />
         </div>

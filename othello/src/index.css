@@ -43,7 +43,8 @@ h1 {
   width: 60px;
 }
 
-.back_button_wrapper {
+.back_button_wrapper,
+#helpButton {
   position: fixed;
   left: 1vw;
   top: 2.5vh;
@@ -134,3 +135,90 @@ label {
 .game-info {
   margin-left: 20px;
 }
+
+/* styling for Home */
+
+#mainHome{
+	width:80%;
+	display:block;
+	text-align: center;
+}
+
+#lbButton, .playButton{
+	position:absolute;
+	left:25vw;
+	font-size: 35px;
+	width:30vw;
+	height:10vh;
+	margin-bottom:20px;
+}
+
+#playAIButton{
+	top:60vh;
+}
+#playPlayerButton{
+	top:45vh;
+}
+#lbButton{
+	top:75vh;
+}
+
+#sidePanel{
+	float:right;
+	display:block;
+	width:25%;
+	height:100%;
+	background-color:rgb(34, 40, 38);
+	position:fixed;
+	right:0;
+	top:12.8vh;
+}
+
+#logoutButton{
+	position:fixed;
+	bottom: 10vh;
+	right:8.5vw;
+	font-size: 16px;
+	width:7.5vw;
+	height:5vh;
+}
+
+#homePFP{
+	padding-top:5vh;
+	padding-bottom:5vh;
+}
+
+#profileButton{
+	top: 40vh;
+	right:5vw;
+	font-size: 30px;
+	width:15vw;
+	height:10vh;
+}
+
+#profileButton, #logoutButton, .playButton, #lbButton, #helpButton{
+	border-radius: 30px;
+	position:fixed;
+	color:#8df0c2;
+	background-color: rgb(0, 83, 83);
+	font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+	font-weight: bold;
+}
+
+#helpButton{
+	width:4%;
+	height:5%;
+	font-size: 20px;
+}
+
+/* styling for Help */
+.text{
+	margin-right: 10vw;
+	margin-left: 10vw;
+}
+
+.returnButton{
+	margin-bottom:5vh;
+}
+
+
