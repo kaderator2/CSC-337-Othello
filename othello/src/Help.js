@@ -3,12 +3,12 @@ import {useNavigate} from "react-router-dom"
 
 const navigate = useNavigate();
 
-function ReturnButton() {
+function ReturnButton({id}){
 	function handleClick(){
 		navigate('/home');
 	}	
 	return (
-		<button id="returnButton" onClick={handleClick}> Return to Home </button>
+		<button id={id} className="returnButton" onClick={handleClick}> Return to Home </button>
 	);
 }
 
@@ -30,7 +30,7 @@ function Help() {
             as you can to your color to win the game! </p>
             <br></br>
             <h2> Ranking </h2>
-            <p> Gain ranking points by winning matches against other players! Your total ranking points are a way to show
+            <p> Gain rating points by winning matches against other players! Your total rating points are a way to show
             your skill-level to other players. </p>
             <br></br>
             <h2> Match History </h2>
@@ -38,7 +38,7 @@ function Help() {
             select a match and replay every move. This can be helpful to analyze where you went wrong, devise strategies,
 			or find patterns in gameplay. </p>
 			<br></br>
-			<ReturnButton/>
+			<ReturnButton id='helpReturn'/>
         </div>
     );
 }
