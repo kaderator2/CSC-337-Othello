@@ -14,7 +14,7 @@ function RankTable({list}){
 	            	</tr>
             	</thead>
             	<tbody>
-	            	<tr class='lbRow'>
+	            	<tr className='lbRow'>
 	            		{/* Possible way to do rankings 
 	            		<td> 1 </td>
 	            		<td> {list[0].username} </td>
@@ -23,47 +23,47 @@ function RankTable({list}){
 	            		<td> . </td>
 	            		<td> 0 </td>
 	            	</tr>
-	            	<tr class='lbRow'>
+	            	<tr className='lbRow'>
 	            		<td> 2 </td>
 	            		<td> . </td>
 	            		<td> 0 </td>
 	            	</tr>
-	            	<tr class='lbRow'>
+	            	<tr className='lbRow'>
 	            		<td> 3 </td>
 	            		<td> . </td>
 	            		<td> 0 </td>
 	            	</tr>
-	            	<tr class='lbRow'>
+	            	<tr className='lbRow'>
 	            		<td> 4 </td>
 	            		<td> . </td>
 	            		<td> 0 </td>
 	            	</tr>
-	            	<tr class='lbRow'>
+	            	<tr className='lbRow'>
 	            		<td> 5 </td>
 	            		<td> . </td>
 	            		<td> 0 </td>
 	            	</tr>
-	            	<tr class='lbRow'>
+	            	<tr className='lbRow'>
 	            		<td> 6 </td>
 	            		<td> . </td>
 	            		<td> 0 </td>
 	            	</tr>
-	            	<tr class='lbRow'>
+	            	<tr className='lbRow'>
 	            		<td> 7 </td>
 	            		<td> . </td>
 	            		<td> 0 </td>
 	            	</tr>
-	            	<tr class='lbRow'>
+	            	<tr className='lbRow'>
 	            		<td> 8 </td>
 	            		<td> . </td>
 	            		<td> 0 </td>
 	            	</tr>
-	            	<tr class='lbRow'>
+	            	<tr className='lbRow'>
 	            		<td> 9 </td>
 	            		<td> . </td>
 	            		<td> 0 </td>
 	            	</tr>
-	            	<tr class='lbRow'>
+	            	<tr className='lbRow'>
 	            		<td> 10 </td>
 	            		<td> . </td>
 	            		<td> 0 </td>

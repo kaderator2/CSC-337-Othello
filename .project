@@ -14,4 +14,11 @@
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>othello/src/images/othello_logo.png</name>
+			<type>1</type>
+			<location>C:/Users/andre/Documents/gitrepos/CSC-337-Othello/othello/src/images/othello_logo.png</location>
+		</link>
+	</linkedResources>
 </projectDescription>

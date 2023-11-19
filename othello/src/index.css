@@ -213,13 +213,13 @@ label {
 }
 
 #playAIButton{
-	top:60vh;
+	top:70vh;
 }
 #playPlayerButton{
-	top:45vh;
+	top:55vh;
 }
 #lbButton{
-	top:75vh;
+	top:85vh;
 }
 
 #sidePanel{
@@ -245,6 +245,18 @@ label {
 #homePFP{
 	padding-top:5vh;
 	padding-bottom:5vh;
+	margin-top:2vh;
+}
+
+#homeLogo{
+    display: inline-block;
+    border: none;
+    border-radius: 0;
+    margin:5vh;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size:contain;
+    translate:0px -70px;
 }
 
 #profileButton{
