@@ -92,11 +92,11 @@ label {
   object-fit: contain;
 }
 
-.replay:nth-child(odd) {
+.replay:nth-child(odd), .lbRow:nth-child(odd) {
   background-color:rgb(41, 43, 40);
  }
 
- .replay:nth-child(even) {
+ .replay:nth-child(even), .lbRow:nth-child(even) {
   background-color:rgb(57, 59, 56);
  }
 
@@ -279,5 +279,26 @@ label {
 .returnButton{
 	margin-bottom:5vh;
 }
+
+/* styling for Leaderboard */
+
+.lbRow{
+	height:7.5%;
+}
+
+#rankTable{
+	position:absolute;
+	left:12.5%;
+	top:20%;
+	text-align: center;
+	width:75%;
+	font-size: 30px;
+}
+
+
+
+
+
+
 
 
