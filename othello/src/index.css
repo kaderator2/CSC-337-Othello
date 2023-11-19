@@ -50,7 +50,7 @@ h1 {
   top: 2.5vh;
 }
 
-.back_button {
+.back_button, #helpButton {
   width: 3.5vw;
   height: 4vh;
 }
@@ -255,18 +255,18 @@ label {
 	height:10vh;
 }
 
-#profileButton, #logoutButton, .playButton, #lbButton, #helpButton{
+.green_button {
 	border-radius: 30px;
-	position:fixed;
 	color:#8df0c2;
 	background-color: rgb(0, 83, 83);
 	font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
 	font-weight: bold;
 }
 
+.fixed {
+  position:fixed;
+}
 #helpButton{
-	width:4%;
-	height:5%;
 	font-size: 20px;
 }
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import {useNavigate} from "react-router-dom";
-import { Header } from './Components';
+import { Header, BackButton } from './Components';
 
 function ReturnButton({id}){
     let navigate = useNavigate();
@@ -8,13 +8,14 @@ function ReturnButton({id}){
         navigate('/home');
     }	
 	return (
-		<button id={id} className="returnButton" onClick={goToHome}> Return Home </button>
+		<button id={id} className="returnButton green_button" onClick={goToHome}> Return Home </button>
 	);
 }
 
 function Help() {
     return (
         <div>
+            <BackButton />
             <Header value='How to Play' />
             <br></br>
             <h2> Objective </h2>

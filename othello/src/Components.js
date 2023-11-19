@@ -17,7 +17,7 @@ export function BackButton() {
 
     return (
         <div className='back_button_wrapper'>
-            <button onClick={goToHome} className='back_button'>Back</button>
+            <button onClick={goToHome} className='back_button green_button fixed'>Back</button>
         </div>
     );
 }
@@ -29,7 +29,7 @@ export function NavButton({path, value, id}){
         navigate({navTo});
     }
 	return (
-		<button id={id} className='navButton' onClick={goTo}> {value} </button>
+		<button id={id} className='navButton green_button fixed' onClick={goTo}> {value} </button>
 	);
 }
 

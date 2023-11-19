@@ -28,7 +28,7 @@ function HelpButton(){
     }
 
 	return (
-		<button id="helpButton" onClick={goToHelp}> ? </button>
+		<button id="helpButton" className='green_button fixed' onClick={goToHelp}> ? </button>
 	);
 }
 
@@ -55,7 +55,7 @@ function LogoutButton(){
     }
 		
 	return (
-		<button id="logoutButton" onClick={goToLogin}> Log out </button>
+		<button id="logoutButton" className='green_button fixed' onClick={goToLogin}> Log out </button>
 	);
 }
 
@@ -65,7 +65,7 @@ function ProfileButton(){
         navigate('/profile');
     }
 	return (
-		<button id="profileButton" onClick={goToProfile}> Profile </button>
+		<button id="profileButton" className='green_button fixed' onClick={goToProfile}> Profile </button>
 	);
 }
 
@@ -75,7 +75,7 @@ function LeaderboardButton(){
         navigate('/leaderboard');
     }
 	return (
-		<button id="lbButton" onClick={goToLB}> Leaderboard </button>
+		<button id="lbButton" className='green_button fixed' onClick={goToLB}> Leaderboard </button>
 	);
 }
 
@@ -91,7 +91,7 @@ function PlayButton({opponent}){
 		}
 	}
 	return (
-		<button id={"play"+opponent+"Button"} className="playButton" onClick={goToMatch}>
+		<button id={"play"+opponent+"Button"} className="playButton green_button fixed" onClick={goToMatch}>
 		 Play vs {opponent} </button>
 	);
 }
