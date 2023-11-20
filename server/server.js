@@ -37,6 +37,7 @@ const MatchSchema = new Schema({
 const UserSchema = new Schema({
     username: String,
     password: String,
+    rating: Number,
     matches: []
 });
 
