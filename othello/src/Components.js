@@ -34,27 +34,33 @@ export function NavButton({path, value, id}){
 }
 
 export function ProfilePicture({id, size, src}){
-	return(
-		// eslint-disable-next-line jsx-a11y/alt-text
-		<img src={src} id={id} className="pfp" style={{width:size, height:size}}></img>
-	);
-}
-
-export function PlayerData({id, name, rating, pfp}) {
-    if(pfp) {
+	if(src) {
         var divStyles = {
-            backgroundImage:'url(' + require(pfp) + ')'
+            backgroundImage:'url(' + require(src) + ')',
+            width:size,
+            height:size
         };
     }
     else {
         var divStyles = {
             backgroundImage:'url(' + require('./images/default_pfp.jpg') + ')',
+            width:size,
+            height:size
         };
     }
+	
+	return(
+		<div className='match_pfp image_contain centered_section' 
+		style={divStyles} id={id}></div>
+	);
+}
+
+export function PlayerData({id, name, rating, pfp}) {
     return (
         <div id={id} className='player_data centered_container'>
-            <div className='match_pfp image_contain centered_section' style={divStyles}>
-            </div>
+            {/*<div className='match_pfp image_contain centered_section' style={divStyles}>
+            </div>*/}
+            <ProfilePicture src={pfp}/>
             <div className='match_player_wrapper centered_section'>
                 <h3>{name}</h3>
                 <p>{rating}</p>

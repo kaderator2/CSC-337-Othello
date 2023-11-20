@@ -96,16 +96,24 @@ function PlayButton({opponent}){
 	);
 }
 
-function Logo({src, id}){
+function Logo({id, size}){
+	var style = {
+		    backgroundImage:'url(' + require('./images/othello_logo.png') + ')',
+            width:size,
+            height:size
+    };
 	return(
-		<img src={src} id={id} className="logo"></img>
+		// eslint-disable-next-line jsx-a11y/alt-text
+		//<img src='./images/othello_logo.png' id={id} className="logo" style={style}></img>
+		<div className='match_pfp image_contain centered_section'
+		  style={style} id={id}></div>
 	);
 }
 
 function SidePanel({id}){
 	return (
         <div id={id}>
-            <ProfilePicture id="homePFP" src="" size="50px"/>  {/* Temp size and src */}
+            <ProfilePicture id="homePFP" size="150px"/>  {/* Temp size and src */}
             <br></br>
             <ProfileButton/>
             <br></br>
@@ -118,7 +126,7 @@ function MainHome({id}){
 	return (
         <div id={id}>
             <HelpButton/>
-            <Logo src="" id="homeLogo"/>
+            <Logo id="homeLogo" size="350px"/>
             <br></br>
             <PlayButton opponent="Player" />
             <br></br>

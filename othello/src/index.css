@@ -92,11 +92,11 @@ label {
   object-fit: contain;
 }
 
-.replay:nth-child(odd) {
+.replay:nth-child(odd), .lbRow:nth-child(odd) {
   background-color:rgb(41, 43, 40);
  }
 
- .replay:nth-child(even) {
+ .replay:nth-child(even), .lbRow:nth-child(even) {
   background-color:rgb(57, 59, 56);
  }
 
@@ -213,13 +213,13 @@ label {
 }
 
 #playAIButton{
-	top:60vh;
+	top:70vh;
 }
 #playPlayerButton{
-	top:45vh;
+	top:55vh;
 }
 #lbButton{
-	top:75vh;
+	top:85vh;
 }
 
 #sidePanel{
@@ -245,6 +245,18 @@ label {
 #homePFP{
 	padding-top:5vh;
 	padding-bottom:5vh;
+	margin-top:2vh;
+}
+
+#homeLogo{
+    display: inline-block;
+    border: none;
+    border-radius: 0;
+    margin:5vh;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size:contain;
+    translate:0px -70px;
 }
 
 #profileButton{
@@ -279,5 +291,26 @@ label {
 .returnButton{
 	margin-bottom:5vh;
 }
+
+/* styling for Leaderboard */
+
+.lbRow{
+	height:7.5%;
+}
+
+#rankTable{
+	position:absolute;
+	left:12.5%;
+	top:20%;
+	text-align: center;
+	width:75%;
+	font-size: 30px;
+}
+
+
+
+
+
+
 
 
