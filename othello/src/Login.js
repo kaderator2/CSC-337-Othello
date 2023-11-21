@@ -32,8 +32,7 @@ function Login() {
         try {
             const response = await axios.post('http://localhost:5000/api/login/', { username: username, password: password });
             if (response.data.redirectURL) {
-                console.log(response.data.redirectURL);
-                navigate(response.data.redirectURL);
+                navigate('/home');
             }
         } catch (error) {
             console.error(error);

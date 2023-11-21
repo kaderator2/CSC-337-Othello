@@ -115,12 +115,12 @@ async function attemptUserLogin(req, res) {
                 req.session.userId = user._id;
                 return res.status(200).send({ redirectURL: '/home' });
             } else {
-                return res.status(401).send();
+                return res.status(401).send('Cant find user');
             }
         });
     } catch (err) {
         console.log(err);
-        return res.status(500).send();
+        return res.status(500).send('Error logging in');
     }
 }
 
@@ -146,10 +146,7 @@ async function registerNewUser(req, res) {
         });
 
         // Save the user to the database
-        const savedUser = await user.save();
-
-        // After the user is registered, create a session for the user
-        req.session.userId = savedUser._id;
+        await user.save();
 
         res.end("USER CREATED");
     } catch (error) {
