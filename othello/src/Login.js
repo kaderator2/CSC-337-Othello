@@ -30,7 +30,7 @@ function Login() {
     const navigate = useNavigate();
     const attemptLogin = async () => {
         try {
-            const response = await axios.post('http://localhost:5000/api/login/', { username, password });
+            const response = await axios.post('http://localhost:5000/api/login/', { username: username, password: password });
             if (response.data.redirectURL) {
                 console.log(response.data.redirectURL);
                 navigate(response.data.redirectURL);
