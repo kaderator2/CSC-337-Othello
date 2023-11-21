@@ -1,10 +1,14 @@
 {
   "dependencies": {
     "bcrypt": "^5.1.1",
+    "connect-mongo": "^5.1.0",
+    "connect-mongodb-session": "^3.1.1",
     "cookie-parser": "^1.4.6",
     "create-react-app": "^1.2.1",
     "express": "^4.18.2",
+    "express-session": "^1.17.3",
     "mongoose": "^8.0.1",
+    "node-pre-gyp": "^0.17.0",
     "nodemon": "^3.0.1"
   }
 }
