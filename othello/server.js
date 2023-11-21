@@ -1,9 +1,11 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
+const jwt = require("jsonwebtoken");
 const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 const cors = require('cors');
+const auth = require("./auth");
 
 const app = express();
 
@@ -76,9 +78,70 @@ mongoose.connect(mongoDBURL, {
         registerNewUser(req, res);
     });
 
-    app.post('/api/login', (req, res) => {
-        console.log("user trying to login");
-        attemptUserLogin(req, res);
+    // free endpoint
+    app.get("/api/free-endpoint", (request, response) => {
+        response.json({ message: "You are free to access me anytime" });
+    });
+
+    // authentication endpoint
+    app.get("/api/auth-endpoint", auth, (request, response) => {
+        response.json({ message: "You are authorized to access me" });
+    });
+
+    // login endpoint
+    app.post("/api/login", (request, response) => {
+        // check if user exists
+        User.findOne({ username: userData.username })
+
+            // if user exists
+            .then((user) => {
+                // compare the password entered and the hashed password found
+                bcrypt
+                    .compare(userData.password, user.password)
+
+                    // if the passwords match
+                    .then((passwordCheck) => {
+
+                        // check if password matches
+                        if (!passwordCheck) {
+                            return response.status(400).send({
+                                message: "Passwords does not match",
+                                error,
+                            });
+                        }
+
+                        //   create JWT token
+                        const token = jwt.sign(
+                            {
+                                userId: user._id,
+                                username: userData.username,
+                            },
+                            "RANDOM-TOKEN",
+                            { expiresIn: "24h" }
+                        );
+
+                        //   return success response
+                        response.status(200).send({
+                            message: "Login Successful",
+                            username: userData.username,
+                            token,
+                        });
+                    })
+                    // catch error if password does not match
+                    .catch((error) => {
+                        response.status(400).send({
+                            message: "Passwords does not match",
+                            error,
+                        });
+                    });
+            })
+            // catch error if email does not exist
+            .catch((e) => {
+                response.status(404).send({
+                    message: "User not found",
+                    e,
+                });
+            });
     });
 
     app.get('/api/check-user-is-logged-in', (req, res) => {
