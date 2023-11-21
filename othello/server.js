@@ -7,12 +7,13 @@ const cors = require('cors');
 
 const app = express();
 
-// Define mongoDBURL
-const mongoDBURL = 'mongodb://localhost:27017/connect_mongodb_session_test';
+// Set up DB
+const db = mongoose.connection;
+const mongoDBURL = 'mongodb://127.0.0.1:27017/connect_mongodb_session_test';
+db.on("error", console.error.bind(console, "MongoDB connection error:"));
 
 // Define port
 const port = process.env.PORT || 5000;
-
 const store = new MongoDBStore({
     uri: mongoDBURL,
     collection: 'mySessions'
@@ -35,9 +36,6 @@ app.use(session({
 }));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-
-// Serve static files from the React app
-app.use(express.static('public/index.html'));
 
 /**
  * Specifies the required schemas for the database, items and users.
@@ -84,6 +82,7 @@ mongoose.connect(mongoDBURL, {
     });
 
     app.get('/api/check-user-is-logged-in', (req, res) => {
+        //TODO set isLoggedIn to false in second case
         if (req.session && req.session.userId) {
             res.status(200).send({ isLoggedIn: true });
         } else {
