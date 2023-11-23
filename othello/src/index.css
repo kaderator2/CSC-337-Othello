@@ -1,3 +1,4 @@
+/* General */
 body {
   margin: 0px;
   text-align: center;
@@ -32,11 +33,34 @@ h1 {
   font-size: xxx-large;
 }
 
+.centered_section {
+  display: inline-block;
+}
+
+.image_contain {
+  object-fit: contain;
+}
+
+/* Inputs CSS */
 .input_pair,
 .submit_button {
   display: block;
   margin-bottom: 1vh;
   margin-top: 1vh;
+}
+
+label {
+  margin-right: 0.5vw;
+}
+
+.inputs{
+  width: 300px;
+  height:40px;
+  border-radius: 10px;
+  padding-left:10px;
+  font-size:1.1rem;
+  border:none;
+  outline: none;
 }
 
 .submit_button {
@@ -55,10 +79,6 @@ h1 {
   height: 4vh;
 }
 
-label {
-  margin-right: 0.5vw;
-}
-
 .centered_container {
   text-align: center;
 }
@@ -69,16 +89,13 @@ label {
   margin-top: 8vh;
 }
 
-.centered_section {
-  display: inline-block;
-}
-
 .center_login_buttons, .replay, .player_data {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
+/* Replay section CSS */
 .replay {
   padding-top: 1vh;
   padding-bottom: 1vh;
@@ -88,18 +105,27 @@ label {
   margin-right: 1vw;
 }
 
-.image_contain {
-  object-fit: contain;
-}
-
 .replay:nth-child(odd), .lbRow:nth-child(odd) {
   background-color:rgb(41, 43, 40);
- }
+}
 
- .replay:nth-child(even), .lbRow:nth-child(even) {
+.replay:nth-child(even), .lbRow:nth-child(even) {
   background-color:rgb(57, 59, 56);
- }
+}
 
+.arrow_container {
+  position: absolute;
+}
+
+#replay_forward {
+  right: 40vw;
+}
+
+#replay_back {
+  left: 40vw;
+}
+
+ /* Match CSS */
 .game_container {
   position:relative;
   margin-top: 5vh;
@@ -159,16 +185,6 @@ label {
   box-shadow: 0px 10px 10px rgba(0,0,0,0.1);
 }
 
-input{
-  width: 300px;
-  height:40px;
-  border-radius: 10px;
-  padding-left:10px;
-  font-size:1.1rem;
-  border:none;
-  outline: none;
-}
-
 #top_player {
   right:20px;
   top:10px;
@@ -177,18 +193,6 @@ input{
 #bottom_player {
   left:20px;
   bottom:10px;
-}
-
-.arrow_container {
-  position: absolute;
-}
-
-#replay_forward {
-  right: 40vw;
-}
-
-#replay_back {
-  left: 40vw;
 }
 
 /* styling for Home */
