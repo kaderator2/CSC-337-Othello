@@ -1,7 +1,8 @@
 import React from 'react';
 import { useState } from 'react';
 
-import Default, {Header, BackButton, PlayerData} from './Components'
+import Default, {Header, BackButton, PlayerData} from './Components';
+import Board from './Board';
 
 function Square({ value, onSquareClick }) {
   return (
@@ -11,7 +12,7 @@ function Square({ value, onSquareClick }) {
   );
 }
 
-function Board({ xIsNext, squares, onPlay }) {
+function testBoard({ xIsNext, squares, onPlay }) {
   function handleClick(i) {
     if (calculateWinner(squares) || squares[i]) {
       return;
@@ -94,12 +95,7 @@ function Match() {
               <PlayerData id='top_player' name='test' rating='1400' />
               <PlayerData id='bottom_player' name='test2' rating='1450' />
               <div className="game">
-                <div className="game_board">
-                    <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
-                </div>
-                <div className="game-info">
-                    <ol>{moves}</ol>
-                </div>
+                <Board />
               </div>
             </div>
           </div>
