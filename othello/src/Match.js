@@ -9,9 +9,17 @@ const pieces = {
   2: 'White'
 };
 
+//TODO assign each player a different color
+const playerSide = 1;
 function Board({squares}) {
 
   function handleClick(row, col, nextPlayer) {
+    if(nextPlayer == playerSide) {
+      //TODO check if move is legal
+
+      //TODO if move is legal, create a new board state and put in DB
+      //Then switch turn (if in AI mode, go handle that logic)
+    }
     /*if (calculateWinner(squares) || squares[i]) {
       return;
     }
@@ -109,13 +117,13 @@ function Square({ value, onSquareClick }) {
   );
 }*/
 
-function Match() {
+function Match({mode}) {
   var squares = [
     [0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0],
+    [0,0,0,2,1,0,0,0],
+    [0,0,0,1,2,0,0,0],
     [0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0]

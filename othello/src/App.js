@@ -43,7 +43,8 @@ function App() {
 				<Route path='/home' element={userIsLoggedIn ? <Home /> : <Navigate to="/" />} />
 				<Route path='/help' element={userIsLoggedIn ? <Help /> : <Navigate to="/" />} />
 				<Route path='/leaderboard' element={userIsLoggedIn ? <Leaderboard /> : <Navigate to="/" />} />
-				<Route path='/match' element={userIsLoggedIn ? <Match /> : <Navigate to="/" />} />
+				<Route path='/match/ai' element={userIsLoggedIn ? <Match mode='AI'/> : <Navigate to="/" />} />
+				<Route path='/match/pvp' element={userIsLoggedIn ? <Match mode='PVP'/> : <Navigate to="/" />} />
 				<Route path='/profile' element={userIsLoggedIn ? <Profile /> : <Navigate to="/" />} />
 				<Route path='/replay' element={userIsLoggedIn ? <Replay /> : <Navigate to="/" />} />
 			</Routes>

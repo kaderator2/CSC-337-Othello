@@ -83,11 +83,11 @@ function PlayButton({opponent}){
 	let navigate = useNavigate();
 	const goToMatch = () => { 
         // TODO: determine what kind of match later
-		if({opponent} == "AI") {
-			navigate('/match');
+		if(opponent == "AI") {
+			navigate('/match/ai');
 		}
 		else {
-			navigate('/match');
+			navigate('/match/pvp');
 		}
 	}
 	return (
