@@ -168,20 +168,21 @@ label {
 }
 
 .board_square {
-  width: 3.5vw;
-  height:3.5vw;
+  width:5.2vh;
+  height:5.2vh;
   background-color:#225522;
+  border: 1px solid black;
 }
 
 .board_box {
   background-color: black;
-  width:30vw;
+  width:42vh;
   display:flex;
   flex-wrap:wrap;
   justify-content: space-evenly;
   align-items: center;
-  gap:3px;
-  border: 3px solid black;
+  
+  border: 1px solid black;
   box-shadow: 0px 10px 10px rgba(0,0,0,0.1);
 }
 

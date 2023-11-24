@@ -1,8 +1,61 @@
 import React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import {Header, BackButton, PlayerData} from './Components';
 
-import Default, {Header, BackButton, PlayerData} from './Components';
-import Board from './Board';
+const pieces = {
+  0: 'Open',
+  1: 'Black',
+  2: 'White'
+};
+
+function Board({squares}) {
+
+  function handleClick(row, col, nextPlayer) {
+    /*if (calculateWinner(squares) || squares[i]) {
+      return;
+    }
+    const nextSquares = squares.slice();
+    if (xIsNext) {
+      nextSquares[i] = 'X';
+    } else {
+      nextSquares[i] = 'O';
+    }
+    onPlay(nextSquares);*/
+  }
+
+  const [game, setGame] = useState([]);
+  const dimension = 8;
+
+  const loadGameBoard = ()=>{
+    let arr = [];
+
+    for (let i=0;i<dimension;i++){
+      let temp = [];
+      for (let j=0;j<dimension;j++){
+          temp.push(<div id={i.toString() + j.toString()} className='board_square' onClick={handleClick(i,j)}>
+            <p>{pieces[squares[i][j]]}</p>
+          </div>);
+      }
+      arr.push(temp);
+    }
+
+    setGame(arr);
+  }
+
+  useEffect(()=>{
+    loadGameBoard();
+  });
+
+  return (
+    <div className='board'>
+      <section className='board_box'>
+        {game}
+      </section>
+
+    </div>
+  );
+}
 
 function Square({ value, onSquareClick }) {
   return (
@@ -12,7 +65,7 @@ function Square({ value, onSquareClick }) {
   );
 }
 
-function testBoard({ xIsNext, squares, onPlay }) {
+/*function testBoard({ xIsNext, squares, onPlay }) {
   function handleClick(i) {
     if (calculateWinner(squares) || squares[i]) {
       return;
@@ -54,58 +107,72 @@ function testBoard({ xIsNext, squares, onPlay }) {
       </div>
     </div>
   );
-}
+}*/
 
 function Match() {
-    const [history, setHistory] = useState([Array(9).fill(null)]);
-    const [currentMove, setCurrentMove] = useState(0);
-    const xIsNext = currentMove % 2 === 0;
-    const currentSquares = history[currentMove];
+  var squares = [
+    [0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0]
+  ];
 
-    function handlePlay(nextSquares) {
-        const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
-        setHistory(nextHistory);
-        setCurrentMove(nextHistory.length - 1);
-    }
+  var matchID;
 
-    function jumpTo(nextMove) {
-        setCurrentMove(nextMove);
-    }
+  useEffect(()=>{
+    let p = axios.get('http://localhost:5000/api/create-match/').then((res) => {
+      matchID = res.body;
+    })
+  }, []);
 
-    const moves = history.map((squares, move) => {
-        let description;
-        if (move > 0) {
-        description = 'Go to move #' + move;
-        } else {
-        description = 'Go to game start';
-        }
-        return (
-        <li key={move}>
-            <button onClick={() => jumpTo(move)}>{description}</button>
-        </li>
-        );
-    });
+  /*function handlePlay(nextSquares) {
+      const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
+      setHistory(nextHistory);
+      setCurrentMove(nextHistory.length - 1);
+  }
 
-    return (
-        <div>
-          <BackButton />
-          <Header value='Match' />
-          <div className='match_container centered_container'>
-            <div className='game_container centered_section'>
-              <PlayerData id='top_player' name='test' rating='1400' />
-              <PlayerData id='bottom_player' name='test2' rating='1450' />
-              <div className="game">
-                <Board />
-              </div>
+  function jumpTo(nextMove) {
+      setCurrentMove(nextMove);
+  }
+
+  const moves = history.map((squares, move) => {
+      let description;
+      if (move > 0) {
+      description = 'Go to move #' + move;
+      } else {
+      description = 'Go to game start';
+      }
+      return (
+      <li key={move}>
+          <button onClick={() => jumpTo(move)}>{description}</button>
+      </li>
+      );
+  });*/
+
+  return (
+      <div>
+        <BackButton />
+        <Header value='Match' />
+        <div className='match_container centered_container'>
+          <div className='game_container centered_section'>
+            <PlayerData id='top_player' name='test' rating='1400' />
+            <PlayerData id='bottom_player' name='test2' rating='1450' />
+            <div className="game">
+              <Board squares={squares}/>
             </div>
           </div>
         </div>
-    );
+      </div>
+  );
 }
 
 export default Match;
 
-function calculateWinner(squares) {
+/*function calculateWinner(squares) {
   const lines = [
     [0, 1, 2],
     [3, 4, 5],
@@ -123,4 +190,4 @@ function calculateWinner(squares) {
     }
   }
   return null;
-}
+}*/

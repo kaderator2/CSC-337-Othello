@@ -53,7 +53,8 @@ const MatchSchema = new Schema({
     player1Rating: Number,
     player2Rating: Number,
     winner: Number,
-    boardStates: []
+    boardStates: [],
+    timestamp: Number
 });
 
 const UserSchema = new Schema({
@@ -88,6 +89,12 @@ mongoose.connect(mongoDBURL, {
         } else {
             res.status(200).send({ isLoggedIn: true });
         }
+    });
+
+    /* Match data requests */
+    app.get('/api/create-match', (req, res) => {
+        console.log("match creating");
+        createMatch(req, res);
     });
 
     // The "catchall" handler: for any request that doesn't
@@ -148,6 +155,48 @@ async function registerNewUser(req, res) {
         await user.save();
 
         res.end("USER CREATED");
+    } catch (error) {
+        console.log(error);
+        res.status(500).send(error);
+    }
+}
+
+/* Match functions */
+async function createMatch(req, res) {
+    try {
+        const startingState = [
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0]
+        ];
+
+        const startingBoard = new Board({
+            moveNumber: 0,
+            nextPlayerTurn: 1,
+            boardState: startingState
+        });
+        
+        await startingBoard.save();
+
+        //TODO get player names and ratings somehow
+        const match = new Match({
+            player1Name: 'test',
+            player2Name: 'test2',
+            player1Rating: 123,
+            player2Rating: 345,
+            winner: 0,
+            boardStates: [startingBoard._id.toString()],
+            timestamp: Date.now()
+        });
+
+        await match.save();
+
+        res.end(match._id.toString());
     } catch (error) {
         console.log(error);
         res.status(500).send(error);
