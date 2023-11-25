@@ -15,6 +15,7 @@ const oppSide = playerSide === 1 ? 2 : 1;
 
 function Board({mode}) {
   var toPlay = 1;
+  var move = 1;
   
   var squares = [
     [0,0,0,0,0,0,0,0],
@@ -42,12 +43,13 @@ function Board({mode}) {
           let mostRecentBoardID = matchData.boardStates[matchData.boardStates.length - 1];
           axios.get('http://localhost:5000/api/board-state/' + mostRecentBoardID).then((boardRes) => {
             currentBoardData = boardRes.data;
-            squares = structuredClone(currentBoardData.boardState);
+            squares = currentBoardData.boardState;
             loadGameBoard();
             toPlay = currentBoardData.nextPlayerTurn;
+            move = currentBoardData.moveNumber;
           });
         });
-      }, 1000);
+      }, 500);
     });
     return () => clearInterval(interval);
   }, []);
@@ -60,14 +62,14 @@ function Board({mode}) {
         axios.post('http://localhost:5000/api/add-board-state', {
           match: matchID, 
           board: tempSquares, 
-          move: currentBoardData.moveNumber + 1,
+          move: move + 1,
           toMove: toPlay === 1 ? 2 : 1
         }).then((boardRes) => {
+          toPlay = toPlay === 1 ? 2 : 1;
           if (checkGameEnd()) {
             endGame();
           }
           else {
-            toPlay = toPlay === 1 ? 2 : 1;
             if (mode === 'AI') {
               setTimeout(() => {
                 computerTurn();
@@ -78,13 +80,18 @@ function Board({mode}) {
                   toMove: toPlay === 1 ? 2 : 1
                 }).then((boardRes) => {
                   toPlay = toPlay === 1 ? 2 : 1;
+                  if (checkGameEnd()) {
+                    endGame();
+                  }
                 });
               }, 1000);
+            }
+            else if (mode === 'PVP') {
+              //TODO handle multiplayer stuff
             }
           }
         });
       }
-      //TODO switch turn logic (if in AI mode, go handle that logic)
     }
   }
 
@@ -120,17 +127,19 @@ function Board({mode}) {
     let p2Score = 0;
     for (let i = 0; i < dimension; i++) {
       for (let j = 0; j < dimension; j++) {
-        if (tempSquares[i,j] == 1) {
+        if (tempSquares[i][j] === 1) {
           p1Score += 1;
         }
-        else if (tempSquares[i,j] == 2) {
+        else if (tempSquares[i][j] === 2) {
           p2Score += 1;
         }
       }
     }
+    console.log(p1Score);
+    console.log(p2Score);
 
     //TODO handle pop up or other menu on winning
-    if (p1Score == p2Score) {
+    if (p1Score === p2Score) {
       alert('DRAW');
     }
     else if (p1Score > p2Score) {
@@ -143,46 +152,32 @@ function Board({mode}) {
   //use check to see if the move is allowed (would result in outflank)
   function checkMoveAllowed(row, col, attemptMove) {
     let allowed = false;
-    let count = 0;
     if(tempSquares[row][col] === 0) {
       if (checkMoveOnLine(row, col, 1, 0, attemptMove)) {
         allowed = true;
-        count++;
       }
       if (checkMoveOnLine(row, col, -1, 0, attemptMove)) {
         allowed = true;
-        count++;
       }
       if (checkMoveOnLine(row, col, 0, 1, attemptMove)) {
         allowed = true;
-        count++;
       }
       if (checkMoveOnLine(row, col, 0, -1, attemptMove)) {
         allowed = true;
-        count++;
       }
       if (checkMoveOnLine(row, col, 1, 1, attemptMove)) {
-        console.log('allowed on diagonal ++');
         allowed = true;
-        count++;
       }
       if (checkMoveOnLine(row, col, 1, -1, attemptMove)) {
-        console.log('allowed on diagonal +-');
         allowed = true;
-        count++;
       }
       if (checkMoveOnLine(row, col, -1, 1, attemptMove)) {
-        console.log('allowed on diagonal -+');
         allowed = true;
-        count++;
       }
       if (checkMoveOnLine(row, col, -1, -1, attemptMove)) {
-        console.log('allowed on diagonal --');
         allowed = true;
-        count++;
       }
     }
-    console.log(count);
     return allowed;
   }
 
@@ -197,7 +192,7 @@ function Board({mode}) {
       if (tempSquares[row + (i * dirHorizontal)][col + (i * dirVertical)] === (toPlay === 1 ? 2 : 1)) {
         foundOpp = true;
       }
-      else if (tempSquares[row + (i * dirHorizontal)][col + (i * dirVertical)] === toPlay) {
+      else if (tempSquares[row + (i * dirHorizontal)][col + (i * dirVertical)] === toPlay && i != 0) {
         if (foundOpp === true) {
           if (attemptMove) {
             if(dirHorizontal != 0 && dirVertical != 0) {
@@ -218,7 +213,7 @@ function Board({mode}) {
   function captureDownLine(row, col, dirHorizontal, dirVertical) {
     let i = 0;
     while (0 <= (row + (i * dirHorizontal)) && (row + (i * dirHorizontal)) < dimension && 0 <= (col + (i * dirVertical)) && (col + (i * dirVertical)) < dimension) {
-      if (tempSquares[row + (i * dirHorizontal)][col + (i * dirVertical)] === toPlay) {
+      if (tempSquares[row + (i * dirHorizontal)][col + (i * dirVertical)] === toPlay && i != 0) {
         return;
       }
       tempSquares[row + (i * dirHorizontal)][col + (i * dirVertical)] = toPlay;
