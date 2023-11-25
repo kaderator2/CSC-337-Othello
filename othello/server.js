@@ -21,10 +21,19 @@ const store = new MongoDBStore({
     collection: 'mySessions'
 });
 
-app.use(cors({
-    origin: 'http://localhost:3000',
-    credentials: true
-}));
+// Curb Cores Error by adding a header here
+app.use((req, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader(
+        "Access-Control-Allow-Headers",
+        "Origin, X-Requested-With, Content, Accept, Content-Type, Authorization"
+    );
+    res.setHeader(
+        "Access-Control-Allow-Methods",
+        "GET, POST, PUT, DELETE, PATCH, OPTIONS"
+    );
+    next();
+});
 
 app.use(session({
     secret: 'your secret',
@@ -73,23 +82,40 @@ mongoose.connect(mongoDBURL, {
     useNewUrlParser: true
 }).then(() => {
     // Receives the request to add a user to the database
-    app.post("/api/add/user", (req, res) => {
-        console.log("user trying to register1");
-        registerNewUser(req, res);
+    app.post("/api/add/user", async (req, res) => {
+        try {
+            // Check if a user with the given username already exists
+            const existingUser = await User.findOne({ username: req.body.username });
+            if (existingUser) {
+                return res.status(400).send('A user with that username already exists');
+            }
+
+            // Hash the password
+            const saltRounds = 10;
+            const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
+
+            // Create a new user with the hashed password
+            const user = new User({
+                username: req.body.username,
+                password: hashedPassword,
+                rating: req.body.rating,
+                matches: req.body.matches
+            });
+
+            // Save the user to the database
+            await user.save();
+            res.status(201).send("User created successfully");
+        } catch (error) {
+            // If there is an error, send a 500 error code
+            console.log(error);
+            res.status(500).send("Error creating user");
+        }
     });
 
-    // free endpoint
-    app.get("/api/free-endpoint", (request, response) => {
-        response.json({ message: "You are free to access me anytime" });
-    });
-
-    // authentication endpoint
-    app.get("/api/auth-endpoint", auth, (request, response) => {
-        response.json({ message: "You are authorized to access me" });
-    });
 
     // login endpoint
-    app.post("/api/login", (request, response) => {
+    app.post("/api/login", (req, res) => {
+        let userData = req.body;
         // check if user exists
         User.findOne({ username: userData.username })
 
@@ -104,13 +130,13 @@ mongoose.connect(mongoDBURL, {
 
                         // check if password matches
                         if (!passwordCheck) {
-                            return response.status(400).send({
+                            return res.status(400).send({
                                 message: "Passwords does not match",
                                 error,
                             });
                         }
 
-                        //   create JWT token
+                        // create JWT token
                         const token = jwt.sign(
                             {
                                 userId: user._id,
@@ -120,8 +146,8 @@ mongoose.connect(mongoDBURL, {
                             { expiresIn: "24h" }
                         );
 
-                        //   return success response
-                        response.status(200).send({
+                        // return success response
+                        res.status(200).send({
                             message: "Login Successful",
                             username: userData.username,
                             token,
@@ -129,19 +155,29 @@ mongoose.connect(mongoDBURL, {
                     })
                     // catch error if password does not match
                     .catch((error) => {
-                        response.status(400).send({
-                            message: "Passwords does not match",
+                        res.status(400).send({
+                            message: "Passwords do not match",
                             error,
                         });
                     });
             })
-            // catch error if email does not exist
+            // catch error if user does not exist
             .catch((e) => {
-                response.status(404).send({
+                res.status(404).send({
                     message: "User not found",
                     e,
                 });
             });
+    });
+
+    // free endpoint
+    app.get("/api/free-endpoint", (request, response) => {
+        response.json({ message: "You are free to access me anytime" });
+    });
+
+    // authentication endpoint
+    app.get("/api/auth-endpoint", auth, (request, response) => {
+        response.json({ message: "You are authorized to access me" });
     });
 
     app.get('/api/check-user-is-logged-in', (req, res) => {
@@ -186,33 +222,7 @@ async function attemptUserLogin(req, res) {
     }
 }
 
-const saltRounds = 10;
 
 async function registerNewUser(req, res) {
-    try {
-        // Check if a user with the given username already exists
-        const existingUser = await User.findOne({ username: req.body.username });
-        if (existingUser) {
-            return res.status(400).send('A user with this username already exists');
-        }
 
-        // Hash the password
-        const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
-
-        // Create a new user with the hashed password
-        const user = new User({
-            username: req.body.username,
-            password: hashedPassword,
-            rating: req.body.rating,
-            matches: req.body.matches
-        });
-
-        // Save the user to the database
-        await user.save();
-
-        res.end("USER CREATED");
-    } catch (error) {
-        console.log(error);
-        res.status(500).send(error);
-    }
 }

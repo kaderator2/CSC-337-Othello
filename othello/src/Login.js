@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import Default, { Header } from './Components'
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import Cookies from "universal-cookie";
+const cookies = new Cookies();
 
 function InputPair({ id, value, type, onChange }) {
     return (
@@ -31,8 +33,13 @@ function Login() {
     const attemptLogin = async () => {
         try {
             const response = await axios.post('http://localhost:5000/api/login/', { username: username, password: password });
-            if (response.data.redirectURL) {
-                navigate('/home');
+            if (response.data.message === 'Login Successful') {
+                // set the cookie
+                cookies.set("TOKEN", response.data.token, {
+                    path: "/",
+                });
+                // redirect user to the auth page
+                window.location.href = "/home";
             }
         } catch (error) {
             console.error(error);
