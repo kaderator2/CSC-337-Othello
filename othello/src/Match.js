@@ -58,7 +58,6 @@ function Board({mode}) {
     if(toPlay === playerSide) {
       tempSquares = structuredClone(squares);
       if(checkMoveAllowed(row, col, true)) {
-        console.log(tempSquares);
         axios.post('http://localhost:5000/api/add-board-state', {
           match: matchID, 
           board: tempSquares, 
@@ -105,7 +104,6 @@ function Board({mode}) {
       }
     }
     let space = allowedSpaces[Math.floor(Math.random()*allowedSpaces.length)];
-    console.log(space);
     checkMoveAllowed(space[0], space[1], true);
   }
 
@@ -135,8 +133,6 @@ function Board({mode}) {
         }
       }
     }
-    console.log(p1Score);
-    console.log(p2Score);
 
     //TODO handle pop up or other menu on winning
     if (p1Score === p2Score) {
@@ -195,10 +191,6 @@ function Board({mode}) {
       else if (tempSquares[row + (i * dirHorizontal)][col + (i * dirVertical)] === toPlay && i != 0) {
         if (foundOpp === true) {
           if (attemptMove) {
-            if(dirHorizontal != 0 && dirVertical != 0) {
-              console.log('attempting diagonal');
-            }
-            console.log('attempting capture');
             captureDownLine(row, col, dirHorizontal, dirVertical);
           }
           return true;
@@ -217,7 +209,6 @@ function Board({mode}) {
         return;
       }
       tempSquares[row + (i * dirHorizontal)][col + (i * dirVertical)] = toPlay;
-      console.log(tempSquares);
       i++;
     }
   }
