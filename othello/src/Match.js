@@ -11,11 +11,55 @@ const pieces = {
 
 //TODO assign each player a different color
 const playerSide = 1;
-function Board({squares}) {
+const oppSide = playerSide === 1 ? 2 : 1;
 
-  function handleClick(row, col, nextPlayer) {
-    if(nextPlayer == playerSide) {
-      //TODO check if move is legal
+function Board() {
+  var nextPlayer = 1;
+  
+  var squares = [
+    [0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0],
+    [0,0,0,2,1,0,0,0],
+    [0,0,0,1,2,0,0,0],
+    [0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0]
+  ];
+
+  var matchID;
+  var matchData;
+  var currentBoardData;
+
+  useEffect(()=>{
+    var interval;
+    axios.get('http://localhost:5000/api/create-match/').then((res) => {
+      matchID = res.data;
+      interval = setInterval(function () {
+        axios.get('http://localhost:5000/api/match-state/' + matchID).then((matchRes) => {
+          matchData = matchRes.data;
+          let mostRecentBoardID = matchData.boardStates[matchData.boardStates.length - 1];
+          axios.get('http://localhost:5000/api/board-state/' + mostRecentBoardID).then((boardRes) => {
+            currentBoardData = boardRes.data;
+            console.log(boardRes.data);
+            squares = structuredClone(currentBoardData.boardState);
+            loadGameBoard();
+            nextPlayer = currentBoardData.nextPlayerTurn;
+          });
+        });
+      }, 1000);
+    });
+    return () => clearInterval(interval);
+  }, []);
+
+  function handleClick(row, col) {
+    if(nextPlayer === playerSide) {
+      if(checkMoveAllowed(row, col)) {
+        placePiece(row, col);
+        console.log(squares);
+
+        //nextPlayer = nextPlayer === 1 ? 2 : 1;
+      }
 
       //TODO if move is legal, create a new board state and put in DB
       //Then switch turn (if in AI mode, go handle that logic)
@@ -32,16 +76,108 @@ function Board({squares}) {
     onPlay(nextSquares);*/
   }
 
+  //use check to see if the move is allowed (would result in outflank)
+  function checkMoveAllowed(row, col) {
+    if(squares[row][col] === 0) {
+      if(squares[row+1] && squares[row+1][col] === oppSide){
+        return checkMoveOnLine(row, col, 1, 0);
+      }
+      else if(squares[row-1] && squares[row-1][col] === oppSide){
+        return checkMoveOnLine(row, col, -1, 0);
+      }
+      else if(squares[row][col+1] && squares[row][col+1] === oppSide){
+        return checkMoveOnLine(row, col, 0, 1);
+      }
+      else if(squares[row][col-1] && squares[row][col-1] === oppSide){
+        return checkMoveOnLine(row, col, 0, -1);
+      }
+      else if(squares[row+1] && squares[row+1][col+1] && squares[row+1][col+1] === oppSide){
+        return checkMoveOnLine(row, col, 1, 1);
+      }
+      else if(squares[row+1] && squares[row+1][col-1] && squares[row+1][col-1] === oppSide){
+        return checkMoveOnLine(row, col, 1, -1);
+      }
+      else if(squares[row-1] && squares[row-1][col-1] && squares[row-1][col-1] === oppSide){
+        return checkMoveOnLine(row, col, -1, 1);
+      }
+      else if(squares[row-1] && squares[row-1][col+1] && squares[row-1][col+1] === oppSide){
+        return checkMoveOnLine(row, col, -1, 1);
+      }
+    }
+    return false;
+  }
+
+  //check if line is opposing pieces sandwiched between own pieces
+  function checkMoveOnLine(row, col, dirHorizontal, dirVertical) {
+    let i = 0;
+    let foundOpp = false;
+    while(0 <= (row + (i * dirHorizontal)) && (row + (i * dirHorizontal)) < 8 && 0 <= (col + (i * dirVertical)) && (col + (i * dirVertical)) < 8) {
+      if(squares[row + (i * dirHorizontal)][col + (i * dirVertical)] === oppSide) {
+        foundOpp = true;
+      }
+      else if(squares[row + (i * dirHorizontal)][col + (i * dirVertical)] === playerSide) {
+        if(foundOpp === true) {
+          return true;
+        }
+        return false;
+      }
+      i++;
+    }
+    return false;
+  }
+
+  function placePiece(row, col) {
+    squares[row][col] = playerSide;
+
+    if(squares[row+1] && squares[row+1][col] === oppSide){
+      handleCaptureDownLine(row, col, 1, 0);
+    }
+    if(squares[row-1] && squares[row-1][col] === oppSide){
+      handleCaptureDownLine(row, col, -1, 0);
+    }
+    if(squares[row][col+1] && squares[row][col+1] === oppSide){
+      handleCaptureDownLine(row, col, 0, 1);
+    }
+    if(squares[row][col-1] && squares[row][col-1] === oppSide){
+      handleCaptureDownLine(row, col, 0, -1);
+    }
+    if(squares[row+1] && squares[row+1][col+1] && squares[row+1][col+1] === oppSide){
+      handleCaptureDownLine(row, col, 1, 1);
+    }
+    if(squares[row+1] && squares[row+1][col-1] && squares[row+1][col-1] === oppSide){
+      handleCaptureDownLine(row, col, 1, -1);
+    }
+    if(squares[row-1] && squares[row-1][col-1] && squares[row-1][col-1] === oppSide){
+      handleCaptureDownLine(row, col, -1, 1);
+    }
+    if(squares[row-1] && squares[row-1][col+1] && squares[row-1][col+1] === oppSide){
+      handleCaptureDownLine(row, col, -1, 1);
+    }
+  }
+
+  function handleCaptureDownLine(row, col, dirHorizontal, dirVertical) {
+    let i = 0;
+    while(squares[row + (i * dirHorizontal)][col + (i * dirVertical)] !== undefined) {
+      squares[row + (i * dirHorizontal)][col + (i * dirVertical)] = playerSide;
+
+      if(squares[row + (i * dirHorizontal)][col + (i * dirVertical)] === playerSide) {
+        return;
+      }
+      i++;
+    }
+  }
+
   const [game, setGame] = useState([]);
   const dimension = 8;
 
   const loadGameBoard = ()=>{
+    console.log(squares);
     let arr = [];
 
     for (let i=0;i<dimension;i++){
       let temp = [];
       for (let j=0;j<dimension;j++){
-          temp.push(<div id={i.toString() + j.toString()} className='board_square' onClick={handleClick(i,j)}>
+          temp.push(<div id={i.toString() + j.toString()} className='board_square' onClick={() => handleClick(i,j)}>
             <p>{pieces[squares[i][j]]}</p>
           </div>);
       }
@@ -53,7 +189,7 @@ function Board({squares}) {
 
   useEffect(()=>{
     loadGameBoard();
-  });
+  },[]);
 
   return (
     <div className='board'>
@@ -62,14 +198,6 @@ function Board({squares}) {
       </section>
 
     </div>
-  );
-}
-
-function Square({ value, onSquareClick }) {
-  return (
-    <button className="square" onClick={onSquareClick}>
-      {value}
-    </button>
   );
 }
 
@@ -118,24 +246,6 @@ function Square({ value, onSquareClick }) {
 }*/
 
 function Match({mode}) {
-  var squares = [
-    [0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0],
-    [0,0,0,2,1,0,0,0],
-    [0,0,0,1,2,0,0,0],
-    [0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0]
-  ];
-
-  var matchID;
-
-  useEffect(()=>{
-    let p = axios.get('http://localhost:5000/api/create-match/').then((res) => {
-      matchID = res.body;
-    })
-  }, []);
 
   /*function handlePlay(nextSquares) {
       const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
@@ -170,7 +280,7 @@ function Match({mode}) {
             <PlayerData id='top_player' name='test' rating='1400' />
             <PlayerData id='bottom_player' name='test2' rating='1450' />
             <div className="game">
-              <Board squares={squares}/>
+              <Board />
             </div>
           </div>
         </div>

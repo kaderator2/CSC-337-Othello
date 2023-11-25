@@ -97,6 +97,16 @@ mongoose.connect(mongoDBURL, {
         createMatch(req, res);
     });
 
+    app.get('/api/match-state/:match_id', (req, res) => {
+        console.log("checking match state");
+        matchState(req, res);
+    });
+
+    app.get('/api/board-state/:board_id', (req, res) => {
+        console.log("checking board state");
+        boardState(req, res);
+    });
+
     // The "catchall" handler: for any request that doesn't
     // match one above, send back React's index.html file.
     app.get('*', (req, res) => {
@@ -197,6 +207,34 @@ async function createMatch(req, res) {
         await match.save();
 
         res.end(match._id.toString());
+    } catch (error) {
+        console.log(error);
+        res.status(500).send(error);
+    }
+}
+
+async function matchState(req, res) {
+    try {
+        let match = await Match.findOne({ _id: req.params.match_id}).exec();
+        if (match) {
+            let matchJSON = match.toJSON();
+            res.end(JSON.stringify(matchJSON));
+        }
+        res.end('ERROR');
+    } catch (error) {
+        console.log(error);
+        res.status(500).send(error);
+    }
+}
+
+async function boardState(req, res) {
+    try {
+        let board = await Board.findOne({ _id: req.params.board_id}).exec();
+        if (board) {
+            console.log(JSON.stringify(board));
+            res.end(JSON.stringify(board));
+        }
+        res.end('ERROR');
     } catch (error) {
         console.log(error);
         res.status(500).send(error);
