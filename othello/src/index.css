@@ -172,6 +172,23 @@ label {
   height:5.2vh;
   background-color:#225522;
   border: 1px solid black;
+  display: flex;
+  align-items: center;
+}
+
+.piece {
+  margin: auto;
+  width: 80%;
+  height: 80%;
+  border-radius: 50%;
+}
+
+.black {
+  background-color: black;
+}
+
+.white {
+  background-color: white;
 }
 
 .board_box {

@@ -247,19 +247,21 @@ async function boardState(req, res) {
 
 async function addBoardState(req, res) {
     try {
-        const match = await Match.findOne({ _id: req.body.match}).exec();
+        var match = await Match.findOne({ _id: req.body.match}).exec();
 
         const newBoard = new Board({
             moveNumber: req.body.move,
             nextPlayerTurn: req.body.toMove,
             boardState: req.body.board
         });
-        
-        match.boardStates.push(newBoard._id.toString());
 
         await newBoard.save();
+
+        match.boardStates.push(newBoard._id.toString());
+        match.markModified('boardStates');
         await match.save();
 
+        console.log("board added\n", newBoard.boardState);
         res.end('BOARD ADD SUCCESS');
     } catch (error) {
         console.log(error);
