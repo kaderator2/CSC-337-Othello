@@ -236,7 +236,6 @@ async function boardState(req, res) {
     try {
         let board = await Board.findOne({ _id: req.params.board_id}).exec();
         if (board) {
-            console.log(JSON.stringify(board));
             res.end(JSON.stringify(board));
         }
         res.end('ERROR');
