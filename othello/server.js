@@ -107,6 +107,11 @@ mongoose.connect(mongoDBURL, {
         boardState(req, res);
     });
 
+    app.post('/api/add-board-state', (req, res) => {
+        console.log("adding board state");
+        addBoardState(req, res);
+    });
+
     // The "catchall" handler: for any request that doesn't
     // match one above, send back React's index.html file.
     app.get('*', (req, res) => {
@@ -235,6 +240,28 @@ async function boardState(req, res) {
             res.end(JSON.stringify(board));
         }
         res.end('ERROR');
+    } catch (error) {
+        console.log(error);
+        res.status(500).send(error);
+    }
+}
+
+async function addBoardState(req, res) {
+    try {
+        const match = await Match.findOne({ _id: req.body.match}).exec();
+
+        const newBoard = new Board({
+            moveNumber: req.body.move,
+            nextPlayerTurn: req.body.toMove,
+            boardState: req.body.board
+        });
+        
+        match.boardStates.push(newBoard._id.toString());
+
+        await newBoard.save();
+        await match.save();
+
+        res.end('BOARD ADD SUCCESS');
     } catch (error) {
         console.log(error);
         res.status(500).send(error);

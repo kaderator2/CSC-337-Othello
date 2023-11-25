@@ -14,7 +14,7 @@ const playerSide = 1;
 const oppSide = playerSide === 1 ? 2 : 1;
 
 function Board() {
-  var nextPlayer = 1;
+  var toPlay = 1;
   
   var squares = [
     [0,0,0,0,0,0,0,0],
@@ -26,6 +26,7 @@ function Board() {
     [0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0]
   ];
+  var tempSquares;
 
   var matchID;
   var matchData;
@@ -41,10 +42,9 @@ function Board() {
           let mostRecentBoardID = matchData.boardStates[matchData.boardStates.length - 1];
           axios.get('http://localhost:5000/api/board-state/' + mostRecentBoardID).then((boardRes) => {
             currentBoardData = boardRes.data;
-            console.log(boardRes.data);
             squares = structuredClone(currentBoardData.boardState);
             loadGameBoard();
-            nextPlayer = currentBoardData.nextPlayerTurn;
+            toPlay = currentBoardData.nextPlayerTurn;
           });
         });
       }, 1000);
@@ -53,12 +53,18 @@ function Board() {
   }, []);
 
   function handleClick(row, col) {
-    if(nextPlayer === playerSide) {
+    if(toPlay === playerSide) {
+      tempSquares = structuredClone(squares);
       if(checkMoveAllowed(row, col)) {
-        placePiece(row, col);
-        console.log(squares);
-
-        //nextPlayer = nextPlayer === 1 ? 2 : 1;
+        console.log(tempSquares);
+        axios.post('http://localhost:5000/api/add-board-state', {
+          match: matchID, 
+          board: tempSquares, 
+          move: currentBoardData.moveNumber + 1,
+          toMove: toPlay === 1 ? 2 : 1
+        }).then((boardRes) => {
+          //TODO check if game-ending move
+        });
       }
 
       //TODO if move is legal, create a new board state and put in DB
@@ -78,45 +84,67 @@ function Board() {
 
   //use check to see if the move is allowed (would result in outflank)
   function checkMoveAllowed(row, col) {
-    if(squares[row][col] === 0) {
-      if(squares[row+1] && squares[row+1][col] === oppSide){
-        return checkMoveOnLine(row, col, 1, 0);
+    let allowed = false;
+    if(tempSquares[row][col] === 0) {
+      if(tempSquares[row+1] && tempSquares[row+1][col] === oppSide) {
+        if (checkMoveOnLine(row, col, 1, 0)) {
+          allowed = true;
+        }
       }
-      else if(squares[row-1] && squares[row-1][col] === oppSide){
+      if(tempSquares[row-1] && tempSquares[row-1][col] === oppSide) {
         return checkMoveOnLine(row, col, -1, 0);
       }
-      else if(squares[row][col+1] && squares[row][col+1] === oppSide){
-        return checkMoveOnLine(row, col, 0, 1);
+      if(tempSquares[row][col+1] && tempSquares[row][col+1] === oppSide) {
+        if (checkMoveOnLine(row, col, 0, 1)) {
+          allowed = true;
+        }
       }
-      else if(squares[row][col-1] && squares[row][col-1] === oppSide){
-        return checkMoveOnLine(row, col, 0, -1);
+      if(tempSquares[row][col-1] && tempSquares[row][col-1] === oppSide) {
+        console.log('test3');
+        if (checkMoveOnLine(row, col, 0, -1)) {
+          console.log('test');
+          allowed = true;
+        }
       }
-      else if(squares[row+1] && squares[row+1][col+1] && squares[row+1][col+1] === oppSide){
-        return checkMoveOnLine(row, col, 1, 1);
+      if(tempSquares[row+1] && tempSquares[row+1][col+1] && tempSquares[row+1][col+1] === oppSide) {
+        if (checkMoveOnLine(row, col, 1, 1)) {
+          allowed = true;
+        }
       }
-      else if(squares[row+1] && squares[row+1][col-1] && squares[row+1][col-1] === oppSide){
-        return checkMoveOnLine(row, col, 1, -1);
+      if(tempSquares[row+1] && tempSquares[row+1][col-1] && tempSquares[row+1][col-1] === oppSide) {
+        if (checkMoveOnLine(row, col, 1, -1)) {
+          allowed = true;
+        }
       }
-      else if(squares[row-1] && squares[row-1][col-1] && squares[row-1][col-1] === oppSide){
-        return checkMoveOnLine(row, col, -1, 1);
+      if(tempSquares[row-1] && tempSquares[row-1][col-1] && tempSquares[row-1][col-1] === oppSide) {
+        if (checkMoveOnLine(row, col, -1, 1)) {
+          allowed = true;
+        }
       }
-      else if(squares[row-1] && squares[row-1][col+1] && squares[row-1][col+1] === oppSide){
-        return checkMoveOnLine(row, col, -1, 1);
+      if(tempSquares[row-1] && tempSquares[row-1][col+1] && tempSquares[row-1][col+1] === oppSide) {
+        if (checkMoveOnLine(row, col, -1, 1)) {
+          allowed = true;
+        }
       }
     }
-    return false;
+    return allowed;
   }
 
   //check if line is opposing pieces sandwiched between own pieces
   function checkMoveOnLine(row, col, dirHorizontal, dirVertical) {
     let i = 0;
     let foundOpp = false;
-    while(0 <= (row + (i * dirHorizontal)) && (row + (i * dirHorizontal)) < 8 && 0 <= (col + (i * dirVertical)) && (col + (i * dirVertical)) < 8) {
-      if(squares[row + (i * dirHorizontal)][col + (i * dirVertical)] === oppSide) {
+    while(0 <= (row + (i * dirHorizontal)) && (row + (i * dirHorizontal)) < dimension && 0 <= (col + (i * dirVertical)) && (col + (i * dirVertical)) < dimension) {
+      if(tempSquares[row + (i * dirHorizontal)][col + (i * dirVertical)] === 0 && i != 0) {
+        return false;
+      }
+      if(tempSquares[row + (i * dirHorizontal)][col + (i * dirVertical)] === oppSide) {
+        console.log('test2');
         foundOpp = true;
       }
-      else if(squares[row + (i * dirHorizontal)][col + (i * dirVertical)] === playerSide) {
+      else if(tempSquares[row + (i * dirHorizontal)][col + (i * dirVertical)] === playerSide) {
         if(foundOpp === true) {
+          captureDownLine(row, col, dirHorizontal, dirVertical);
           return true;
         }
         return false;
@@ -126,43 +154,16 @@ function Board() {
     return false;
   }
 
-  function placePiece(row, col) {
-    squares[row][col] = playerSide;
-
-    if(squares[row+1] && squares[row+1][col] === oppSide){
-      handleCaptureDownLine(row, col, 1, 0);
-    }
-    if(squares[row-1] && squares[row-1][col] === oppSide){
-      handleCaptureDownLine(row, col, -1, 0);
-    }
-    if(squares[row][col+1] && squares[row][col+1] === oppSide){
-      handleCaptureDownLine(row, col, 0, 1);
-    }
-    if(squares[row][col-1] && squares[row][col-1] === oppSide){
-      handleCaptureDownLine(row, col, 0, -1);
-    }
-    if(squares[row+1] && squares[row+1][col+1] && squares[row+1][col+1] === oppSide){
-      handleCaptureDownLine(row, col, 1, 1);
-    }
-    if(squares[row+1] && squares[row+1][col-1] && squares[row+1][col-1] === oppSide){
-      handleCaptureDownLine(row, col, 1, -1);
-    }
-    if(squares[row-1] && squares[row-1][col-1] && squares[row-1][col-1] === oppSide){
-      handleCaptureDownLine(row, col, -1, 1);
-    }
-    if(squares[row-1] && squares[row-1][col+1] && squares[row-1][col+1] === oppSide){
-      handleCaptureDownLine(row, col, -1, 1);
-    }
-  }
-
-  function handleCaptureDownLine(row, col, dirHorizontal, dirVertical) {
+  function captureDownLine(row, col, dirHorizontal, dirVertical) {
+    console.log('checking capture');
     let i = 0;
-    while(squares[row + (i * dirHorizontal)][col + (i * dirVertical)] !== undefined) {
-      squares[row + (i * dirHorizontal)][col + (i * dirVertical)] = playerSide;
-
-      if(squares[row + (i * dirHorizontal)][col + (i * dirVertical)] === playerSide) {
+    while(0 <= (row + (i * dirHorizontal)) && (row + (i * dirHorizontal)) < dimension && 0 <= (col + (i * dirVertical)) && (col + (i * dirVertical)) < dimension) {
+      console.log('iterating');
+      if(tempSquares[row + (i * dirHorizontal)][col + (i * dirVertical)] === playerSide) {
         return;
       }
+      tempSquares[row + (i * dirHorizontal)][col + (i * dirVertical)] = playerSide;
+      console.log(tempSquares);
       i++;
     }
   }
@@ -171,7 +172,6 @@ function Board() {
   const dimension = 8;
 
   const loadGameBoard = ()=>{
-    console.log(squares);
     let arr = [];
 
     for (let i=0;i<dimension;i++){
