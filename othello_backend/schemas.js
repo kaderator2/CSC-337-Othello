@@ -24,6 +24,7 @@ const UserSchema = new Schema({
     username: String,
     password: String,
     rating: Number,
+    room: Number,
     matches: []
 });
 

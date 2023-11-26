@@ -33,6 +33,7 @@ router.route("/add/user").post(async (req, res) => {
             username: req.body.username,
             password: hashedPassword,
             rating: req.body.rating,
+            room: 0,
             matches: req.body.matches
         });
 
@@ -134,6 +135,47 @@ router.route("/logout").get((req, res) => {
 
         res.status(200).send("Logout successful");
     });
+});
+
+/* Create and get room number request */
+let playerCounter = 0;
+let roomNumber = 1;
+router.route('/get-room').post((req, res) => {
+    console.log("Getting new room number");
+    // control of 2-player lobbies
+	playerCounter++;
+	roomNumber = playerCounter%3 !== 0 ? roomNumber : roomNumber+1;
+	
+	let name = req.body.username;
+	let p = User.find({ username : name }).exec();
+	p.then((results) => {
+		let user = results[0];
+		user.room = roomNumber;
+		user.save().then(() => {
+			console.log("saved user room successfully");	
+		}).catch((err) => { console.log(err); } );
+	})
+	.catch((err) => {
+		console.log("Error finding user when getting room");
+		console.log(err);		
+	});
+	
+	console.log('Joining room ' + roomNumber + ' from server');
+	res.send(roomNumber);
+});
+
+/* Request for getting players in a room */
+router.route('/room-size/:room').get((req, res) => {
+	let roomNumber = req.params.room;
+    console.log("getting number of players in room " + roomNumber);
+    let p = User.find({room : roomNumber});
+    p.then((users) => {
+		res.send(users.length);
+	})
+	.catch((err) => {
+		console.log("Error getting users in room " + roomNumber);
+		console.log(err);
+	});
 });
 
 /* Match data requests */

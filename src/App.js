@@ -8,6 +8,8 @@ import Match from './Match';
 import Profile from './Profile';
 import Replay from './Replay';
 import Login from './Login';
+import Lobby from './Lobby';
+
 
 function App() {
 	return (
@@ -22,6 +24,7 @@ function App() {
 					<Route exact path='/match/pvp' element={<Match mode='PVP'/>} />
 					<Route exact path='/profile' element={<Profile />} />
 					<Route exact path='/replay' element={<Replay />} />
+					<Route exact path='/lobby' element={<Lobby />} />
 				</Route>
 			</Routes>
 		</div>
