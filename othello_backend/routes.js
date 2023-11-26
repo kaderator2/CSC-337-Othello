@@ -1,0 +1,147 @@
+var express = require('express');
+const { User, Board, Match } = require("./schemas");
+const auth = require("./auth");
+const bcrypt = require('bcrypt');
+const jwt = require("jsonwebtoken");
+
+var router = express.Router();
+
+// Receives the request to add a user to the database
+router.route("/add/user").post(async (req, res) => {
+    try {
+        // Check if the username or password is empty
+        if (req.body.username === "" || req.body.password === "") {
+            return res.status(400).send({
+                message: "Username or password cannot be empty",
+            });
+        }
+        // Check if a user with the given username already exists
+        const existingUser = await User.findOne({ username: req.body.username });
+        if (existingUser) {
+            return res.status(400).send({
+                message: "User already exists",
+            });
+        }
+
+        // Hash the password
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
+
+        // Create a new user with the hashed password
+        const user = new User({
+            username: req.body.username,
+            password: hashedPassword,
+            rating: req.body.rating,
+            matches: req.body.matches
+        });
+
+        // Save the user to the database
+        await user.save();
+        res.status(201).send({
+            message: "User created successfully",
+        });
+    } catch (error) {
+        // If there is an error, send a 500 error code
+        console.log(error);
+        res.status(500).send({
+            message: "Error creating user",
+            error,
+        });
+    }
+});
+
+
+// login endpoint
+router.route("/login").post((req, res) => {
+    let userData = req.body;
+    // check if user exists
+    User.findOne({ username: userData.username })
+
+        // if user exists
+        .then((user) => {
+            // compare the password entered and the hashed password found
+            bcrypt
+                .compare(userData.password, user.password)
+
+                // if the passwords match
+                .then((passwordCheck) => {
+
+                    // check if password matches
+                    if (!passwordCheck) {
+                        return res.status(400).send({
+                            message: "Invalid Username or Password",
+                            error,
+                        });
+                    }
+
+                    // create JWT token
+                    const token = jwt.sign(
+                        {
+                            userId: user._id,
+                            username: userData.username,
+                        },
+                        "RANDOM-TOKEN",
+                        { expiresIn: "24h" }
+                    );
+
+                    // return success response
+                    res.status(200).send({
+                        message: "Login Successful",
+                        username: userData.username,
+                        token,
+                    });
+                })
+                // catch error if password does not match
+                .catch((error) => {
+                    res.status(400).send({
+                        message: "Invalid Username or Password",
+                        error,
+                    });
+                });
+        })
+        // catch error if user does not exist
+        .catch((error) => {
+            res.status(404).send({
+                message: "User not found",
+                error,
+            });
+        });
+});
+
+// free endpoint
+router.get("/free-endpoint", (request, response) => {
+    response.json({ message: "You are free to access me anytime" });
+});
+
+// authentication endpoint
+router.route("/auth-endpoint").get(auth, (request, response) => {
+    response.json({ message: "You are authorized to access me" });
+});
+
+router.route('/check-user-is-logged-in').get((req, res) => {
+    //TODO set isLoggedIn to false in second case
+    if (req.session && req.session.userId) {
+        res.status(200).send({ isLoggedIn: true });
+    } else {
+        res.status(200).send({ isLoggedIn: true });
+    }
+});
+
+// Logout endpoint
+router.route("/logout").get((req, res) => {
+    console.log("Logging out");
+    // Clear the session data or token (example using session, modify as per your authentication method)
+    req.session.destroy((err) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).send("Error logging out");
+        }
+
+        // Clear the JWT token from client-side (example using cookies, modify according to your setup)
+        res.clearCookie("TOKEN"); // Clear the cookie named "TOKEN" where the JWT token is stored
+
+        res.status(200).send("Logout successful");
+    });
+});
+
+module.exports = router;

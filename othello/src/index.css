@@ -1,7 +1,7 @@
 body {
   margin: 0px;
   text-align: center;
-  font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
   font-size: large;
   color: #ffffff;
   background-color: rgb(57, 59, 56);
@@ -23,8 +23,12 @@ code {
   padding-top: 2vh;
   padding-bottom: 2vh;
 }
-h1, h2, h3 {
-  color: #8df0c2;;
+
+h1,
+h2,
+h3 {
+  color: #8df0c2;
+  ;
 }
 
 h1 {
@@ -50,7 +54,8 @@ h1 {
   top: 2.5vh;
 }
 
-.back_button, #helpButton {
+.back_button,
+#helpButton {
   width: 3.5vw;
   height: 4vh;
 }
@@ -73,7 +78,9 @@ label {
   display: inline-block;
 }
 
-.center_login_buttons, .replay, .player_data {
+.center_login_buttons,
+.replay,
+.player_data {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -84,7 +91,8 @@ label {
   padding-bottom: 1vh;
 }
 
-.replay_details, .player_details {
+.replay_details,
+.player_details {
   margin-right: 1vw;
 }
 
@@ -92,16 +100,18 @@ label {
   object-fit: contain;
 }
 
-.replay:nth-child(odd), .lbRow:nth-child(odd) {
-  background-color:rgb(41, 43, 40);
- }
+.replay:nth-child(odd),
+.lbRow:nth-child(odd) {
+  background-color: rgb(41, 43, 40);
+}
 
- .replay:nth-child(even), .lbRow:nth-child(even) {
-  background-color:rgb(57, 59, 56);
- }
+.replay:nth-child(even),
+.lbRow:nth-child(even) {
+  background-color: rgb(57, 59, 56);
+}
 
 .game_container {
-  position:relative;
+  position: relative;
   margin-top: 5vh;
   border: 5px solid black;
   width: 70vh;
@@ -148,16 +158,25 @@ label {
 
 .player_data {
   position: absolute;
-  height:85px;
+  height: 85px;
 }
 
 .match_player_wrapper {
-  margin-left:10px;
+  margin-left: 10px;
 }
 
 .match_player_wrapper * {
-  
+
   margin: 0;
+}
+
+.error-message {
+  color: red;
+  font-size: 20px;
+  position: absolute;
+  top: 30vh;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .match_pfp {
@@ -174,13 +193,13 @@ label {
 }
 
 #top_player {
-  right:20px;
-  top:10px;
+  right: 20px;
+  top: 10px;
 }
 
 #bottom_player {
-  left:20px;
-  bottom:10px;
+  left: 20px;
+  bottom: 10px;
 }
 
 .arrow_container {
@@ -197,120 +216,116 @@ label {
 
 /* styling for Home */
 
-#mainHome{
-	width:80%;
-	display:block;
-	text-align: center;
+#mainHome {
+  width: 80%;
+  display: block;
+  text-align: center;
 }
 
-#lbButton, .playButton{
-	position:absolute;
-	left:25vw;
-	font-size: 35px;
-	width:30vw;
-	height:10vh;
-	margin-bottom:20px;
+#lbButton,
+.playButton {
+  position: absolute;
+  left: 25vw;
+  font-size: 35px;
+  width: 30vw;
+  height: 10vh;
+  margin-bottom: 20px;
 }
 
-#playAIButton{
-	top:70vh;
-}
-#playPlayerButton{
-	top:55vh;
-}
-#lbButton{
-	top:85vh;
+#playAIButton {
+  top: 70vh;
 }
 
-#sidePanel{
-	float:right;
-	display:block;
-	width:25%;
-	height:100%;
-	background-color:rgb(34, 40, 38);
-	position:fixed;
-	right:0;
-	top:12.8vh;
+#playPlayerButton {
+  top: 55vh;
 }
 
-#logoutButton{
-	position:fixed;
-	bottom: 10vh;
-	right:8.5vw;
-	font-size: 16px;
-	width:7.5vw;
-	height:5vh;
+#lbButton {
+  top: 85vh;
 }
 
-#homePFP{
-	padding-top:5vh;
-	padding-bottom:5vh;
-	margin-top:2vh;
+#sidePanel {
+  float: right;
+  display: block;
+  width: 25%;
+  height: 100%;
+  background-color: rgb(34, 40, 38);
+  position: fixed;
+  right: 0;
+  top: 12.8vh;
 }
 
-#homeLogo{
-    display: inline-block;
-    border: none;
-    border-radius: 0;
-    margin:5vh;
-    background-repeat: no-repeat;
-    background-position: center center;
-    background-size:contain;
-    translate:0px -70px;
+#logoutButton {
+  position: fixed;
+  bottom: 10vh;
+  right: 8.5vw;
+  font-size: 16px;
+  width: 7.5vw;
+  height: 5vh;
 }
 
-#profileButton{
-	top: 40vh;
-	right:5vw;
-	font-size: 30px;
-	width:15vw;
-	height:10vh;
+#homePFP {
+  padding-top: 5vh;
+  padding-bottom: 5vh;
+  margin-top: 2vh;
+}
+
+#homeLogo {
+  display: inline-block;
+  border: none;
+  border-radius: 0;
+  margin: 5vh;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: contain;
+  translate: 0px -70px;
+}
+
+#profileButton {
+  top: 40vh;
+  right: 5vw;
+  font-size: 30px;
+  width: 15vw;
+  height: 10vh;
 }
 
 .green_button {
-	border-radius: 30px;
-	color:#8df0c2;
-	background-color: rgb(0, 83, 83);
-	font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
-	font-weight: bold;
+  border-radius: 30px;
+  color: #8df0c2;
+  background-color: rgb(0, 83, 83);
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  font-weight: bold;
 }
 
 .fixed {
-  position:fixed;
+  position: fixed;
 }
-#helpButton{
-	font-size: 20px;
+
+#helpButton {
+  font-size: 20px;
 }
 
 /* styling for Help */
-.text{
-	margin-right: 10vw;
-	margin-left: 10vw;
+.text {
+  margin-right: 10vw;
+  margin-left: 10vw;
 }
 
-.returnButton{
-	margin-bottom:5vh;
+.returnButton {
+  margin-bottom: 5vh;
 }
 
 /* styling for Leaderboard */
 
-.lbRow{
-	height:7.5%;
+.lbRow {
+  height: 7.5%;
 }
 
-#rankTable{
-	position:absolute;
-	left:12.5%;
-	top:20%;
-	text-align: center;
-	width:75%;
-	font-size: 30px;
+#rankTable {
+  position: absolute;
+  left: 12.5%;
+  top: 20%;
+  text-align: center;
+  width: 75%;
+  font-size: 30px;
 }
-
-
-
-
-
-
-
-

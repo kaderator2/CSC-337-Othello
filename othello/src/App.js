@@ -8,7 +8,6 @@ import Match from './Match';
 import Profile from './Profile';
 import Replay from './Replay';
 import Login from './Login';
-import Cookies from "universal-cookie";
 
 function App() {
 	return (
