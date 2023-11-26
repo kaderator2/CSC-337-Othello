@@ -2,6 +2,7 @@
  * This file contains the logic for the game.
  * It is responsible for creating new matches, adding board states to matches, and getting board states from matches.
  */
+const { User, Board, Match } = require("./schemas");
 async function createMatch(req, res) {
     try {
         const startingState = [
@@ -94,4 +95,4 @@ async function addBoardState(req, res) {
     }
 }
 
-export default { addBoardState, boardState, matchState, createMatch };
+module.exports = { addBoardState, boardState, matchState, createMatch };

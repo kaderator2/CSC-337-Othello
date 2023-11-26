@@ -1,6 +1,6 @@
 var express = require('express');
 const { User, Board, Match } = require("./schemas");
-const { addBoardState, boardState, matchState, newMatch } = require("./gameLogic");
+const { addBoardState, boardState, matchState, createMatch } = require("./gameLogic");
 const auth = require("./auth");
 const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken");

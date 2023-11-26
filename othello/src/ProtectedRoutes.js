@@ -40,7 +40,8 @@ const ProtectedRoutes = () => {
     }
 
     if (isLoggedIn === false) {
-        return <Navigate to="/" />;
+        console.log("You are not authenticated!");
+        return <Navigate to="/" />; // Redirect to login page if not authenticated
     }
 
     // Once the authentication check is complete and successful,
