@@ -119,15 +119,6 @@ router.route("/auth-endpoint").get(auth, (request, response) => {
     response.json({ message: "You are authorized to access me" });
 });
 
-router.route('/check-user-is-logged-in').get((req, res) => {
-    //TODO set isLoggedIn to false in second case
-    if (req.session && req.session.userId) {
-        res.status(200).send({ isLoggedIn: true });
-    } else {
-        res.status(200).send({ isLoggedIn: true });
-    }
-});
-
 // Logout endpoint
 router.route("/logout").get((req, res) => {
     console.log("Logging out");
