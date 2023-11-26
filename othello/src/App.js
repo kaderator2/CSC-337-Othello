@@ -11,6 +11,8 @@ import Match from './Match';
 import Profile from './Profile';
 import Replay from './Replay';
 import Login from './Login';
+import Lobby from './Lobby';
+
 
 function App() {
 	const [userIsLoggedIn, setUserIsLoggedIn] = useState(null);
@@ -34,7 +36,7 @@ function App() {
 			navigate('/');
 		}
 	}, [userIsLoggedIn, navigate]);
-
+	
 
 	return (
 		<div className='App'>
@@ -46,6 +48,7 @@ function App() {
 				<Route path='/match' element={userIsLoggedIn ? <Match /> : <Navigate to="/" />} />
 				<Route path='/profile' element={userIsLoggedIn ? <Profile /> : <Navigate to="/" />} />
 				<Route path='/replay' element={userIsLoggedIn ? <Replay /> : <Navigate to="/" />} />
+				<Route path='/lobby' element={userIsLoggedIn ? <Lobby /> : <Navigate to="/" />} />
 			</Routes>
 		</div>
 	);

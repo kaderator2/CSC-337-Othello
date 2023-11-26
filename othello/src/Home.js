@@ -1,6 +1,10 @@
-import React from 'react';
 import {useNavigate} from "react-router-dom";
 import { ProfilePicture, Header } from './Components';
+import React, { useState, useEffect } from 'react';
+import io from "socket.io-client";
+
+export const socket = io.connect("http://localhost:3001");
+export var uRoom;
 
 function getUser(){
 	let cookie = decodeURIComponent(document.cookie);
@@ -13,7 +17,7 @@ function getUser(){
 		}
 	}
 	for(let i=0; i < currentUser.length; i++){
-		if(currentUser.charAt(i) == '"'){
+		if(currentUser.charAt(i) === '"'){
 			currentUser = currentUser.substring(0,i);
 			break;
 		}
@@ -81,13 +85,33 @@ function LeaderboardButton(){
 
 function PlayButton({opponent}){
 	let navigate = useNavigate();
-	const goToMatch = () => { 
-        // TODO: determine what kind of match later
-		if({opponent} == "AI") {
-			navigate('/match');
+	let playerCounter = 0;
+	let roomNumber = 1;
+	
+	// -------- Socket.io stuffs -------------
+	//Room State
+  	const [room, setRoom] = useState("");
+
+  	const joinRoom = () => {
+    	if (room !== "") {
+      		socket.emit("join_room", {room});//, username: getUser()});
+    	}
+  	};
+	
+	const goToMatch = () => {
+		if(opponent !== "Player") {
+			navigate('/match/ai');
 		}
 		else {
-			navigate('/match');
+			setRoom(roomNumber);
+			uRoom = roomNumber;
+			// TODO: User schema include room number of current match?
+			// control of 2-player lobbies
+			playerCounter++;
+			roomNumber = playerCounter%2===1 ? roomNumber : roomNumber+1;
+			console.log('joining room from Home')
+			joinRoom();
+			//navigate('/lobby');
 		}
 	}
 	return (
