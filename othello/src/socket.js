@@ -20,12 +20,12 @@ io.on("connection", (socket) => {
   	console.log(`User Connected: ${socket.id}`);
 
  	socket.on("join_room", (data) => {
-		console.log('Joined room ' + data.room);
+		console.log('Joined room ' + data);
     	socket.join(data.room);
   	});
   	
   	socket.on("leave_room", (data) => {
-    	console.log('Left room ' + data.room);
+    	console.log('Left room ' + data);
     	socket.leave(data.room);
   	});
 });

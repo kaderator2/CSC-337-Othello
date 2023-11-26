@@ -1,14 +1,14 @@
 import React from 'react';
-import { Header, BackButton } from './Components';
+import { Header } from './Components';
 import {useNavigate} from "react-router-dom";
-import io from "socket.io-client";
 import { uRoom, socket } from './Home';
+import axios from 'axios';
 
 function BackButtonLobby(){
 	let navigate = useNavigate();
   	
     const action = () => {
-		socket.emit("leave_room", {uRoom});//, username: getUser()});
+		socket.emit("leave_room", uRoom);
         navigate('/home');
     }
 
@@ -28,15 +28,23 @@ function Lobby() {
 		if(inGame)
 			return;
 		else {
-			// TODO: fetch room size from server search of users with room:uRoom
-			if(1 === 2) {
-				inGame = true;
-				navigate('/match/pvp');	
-			}		
+			axios.get('http://localhost:5000/api/room-size/' + uRoom)
+			.then((size) => {
+				console.log("Room size of " + uRoom + ": " + size);
+				console.log("Typeof 'size':" + typeof size);
+				if(size === 2) {
+					inGame = true;
+					navigate('/match/pvp'); // TODO: maybe add room number in path	
+				}
+          	})
+          	.catch((err) => {
+				console.log("Error sending room size request");
+				console.log(err);  
+			});		
 		}
 	};
 	
-	setInterval(matched, 2000);
+	setInterval(matched, 5000);
 	
     return (
         <div>

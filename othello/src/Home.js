@@ -1,28 +1,19 @@
 import {useNavigate} from "react-router-dom";
 import { ProfilePicture, Header } from './Components';
 import React, { useState, useEffect } from 'react';
+//import { setTimeout } from "timers/promises";
+import axios from 'axios';
 import io from "socket.io-client";
+import Cookies from 'universal-cookie';
 
 export const socket = io.connect("http://localhost:3001");
 export var uRoom;
 
 function getUser() {
-	let cookie = decodeURIComponent(document.cookie);
-	let currentUser;
-	for (let i = 0; i < cookie.length; i++) {
-		let sub = cookie.substring(i);
-		if (sub.startsWith('"username":"')) {
-			currentUser = cookie.substring(i + 12);
-			break;
-		}
-	}
-	for (let i = 0; i < currentUser.length; i++) {
-		if (currentUser.charAt(i) == '"') {
-			currentUser = currentUser.substring(0, i);
-			break;
-		}
-	}
-	return currentUser;
+	const cookies = new Cookies();
+	let username = cookies.get('name')
+	console.log(username); 
+	return username;
 }
 
 function HelpButton() {
@@ -37,22 +28,7 @@ function HelpButton() {
 }
 
 function LogoutButton() {
-	function handleClick() {
-		let url = 'http://localhost:5000/api/logout/';
-		let p = fetch(url);
-		p.then((result) => {
-			return result.text();
-		}).then((text) => {
-			if (text == 'Not logged in')
-				console.log(text);
-		})
-			.catch((error) => {
-				console.log('Error logging out');
-				console.log(error);
-			});
-	}
-
-	{/*Temporary*/ }
+	// TODO: call logout from routes.js?
 	let navigate = useNavigate();
 	const goToLogin = () => {
 		navigate('/');
@@ -85,33 +61,40 @@ function LeaderboardButton() {
 
 function PlayButton({ opponent }) {
 	let navigate = useNavigate();
-	let playerCounter = 0;
-	let roomNumber = 1;
+	
+	const getRoom = () => {
+		let name = getUser();
+        axios.post('http://localhost:5000/api/get-room/', { username : name })
+        .then((res) => {
+        	console.log("Get room res: " + res);
+        	return res;    
+        })
+        .catch((err) => {
+			console.log("Error sending room req");
+			console.log(err);		
+		});
+    };
 	
 	// -------- Socket.io stuffs -------------
 	//Room State
   	const [room, setRoom] = useState("");
 
   	const joinRoom = () => {
-    	if (room !== "") {
-      		socket.emit("join_room", {room});//, username: getUser()});
-    	}
+    	/*if (room !== "") {
+      		socket.emit("join_room", {room});
+    	}*/
+    	socket.emit("join_room", uRoom);
   	};
 	
 	const goToMatch = () => {
-		if(opponent !== "Player") {
+		if(opponent === "AI") {
 			navigate('/match/ai');
 		}
 		else {
-			setRoom(roomNumber);
-			uRoom = roomNumber;
-			// TODO: User schema include room number of current match?
-			// control of 2-player lobbies
-			playerCounter++;
-			roomNumber = playerCounter%2===1 ? roomNumber : roomNumber+1;
-			console.log('joining room from Home')
+			uRoom = getRoom();
+			setRoom(uRoom);
 			joinRoom();
-			//navigate('/lobby');
+			navigate('/lobby');
 		}
 	}
 	return (

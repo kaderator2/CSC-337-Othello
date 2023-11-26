@@ -22,12 +22,9 @@
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.19.0",
     "react-scripts": "^5.0.1",
-<<<<<<< HEAD
     "socket.io": "^4.7.2",
     "socket.io-client": "^4.7.2",
-=======
     "universal-cookie": "^6.1.1",
->>>>>>> 887b414c5bff06f94937a2011f4a44e6a8b2f7ad
     "web-vitals": "^2.1.4"
   },
   "scripts": {
