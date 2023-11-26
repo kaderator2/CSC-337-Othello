@@ -20,7 +20,8 @@ function App() {
 					<Route exact path='/home' element={<Home />} />
 					<Route exact path='/help' element={<Help />} />
 					<Route exact path='/leaderboard' element={<Leaderboard />} />
-					<Route exact path='/match/ai' element={<Match />} />
+					<Route exact path='/match/ai' element={<Match mode='AI'/>} />
+					<Route exact path='/match/pvp' element={<Match mode='PVP'/>} />
 					<Route exact path='/profile' element={<Profile />} />
 					<Route exact path='/replay' element={<Replay />} />
 					<Route exact path='/lobby' element={<Lobby />} />
