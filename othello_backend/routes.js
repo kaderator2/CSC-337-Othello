@@ -1,5 +1,6 @@
 var express = require('express');
 const { User, Board, Match } = require("./schemas");
+const { addBoardState, boardState, matchState, newMatch } = require("./gameLogic");
 const auth = require("./auth");
 const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken");
@@ -142,6 +143,27 @@ router.route("/logout").get((req, res) => {
 
         res.status(200).send("Logout successful");
     });
+});
+
+/* Match data requests */
+router.route('/create-match').get((req, res) => {
+    console.log("match creating");
+    createMatch(req, res);
+});
+
+router.route('/match-state/:match_id').get((req, res) => {
+    console.log("checking match state");
+    matchState(req, res);
+});
+
+router.route('/board-state/:board_id').get((req, res) => {
+    console.log("checking board state");
+    boardState(req, res);
+});
+
+router.route('/add-board-state').post((req, res) => {
+    console.log("adding board state");
+    addBoardState(req, res);
 });
 
 module.exports = router;
