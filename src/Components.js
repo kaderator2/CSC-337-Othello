@@ -77,5 +77,13 @@ export function getUsername() {
     return username;
 }
 
+export function getUserRating() {
+    //TODO: get user rating from DB
+}
+
+export function getUserTotalMatches() {
+    //TODO: get user rating from DB
+}
+
 
 export default Header("test");

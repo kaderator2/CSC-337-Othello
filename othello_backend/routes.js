@@ -123,7 +123,7 @@ router.route("/auth-endpoint").get(auth, (request, response) => {
 // Logout endpoint
 router.route("/logout").get((req, res) => {
     console.log("Logging out");
-    // Clear the session data or token (example using session, modify as per your authentication method)
+    // Clear the session data or token
     req.session.destroy((err) => {
         if (err) {
             console.log(err);
@@ -134,6 +134,26 @@ router.route("/logout").get((req, res) => {
         res.clearCookie("TOKEN"); // Clear the cookie named "TOKEN" where the JWT token is stored
 
         res.status(200).send("Logout successful");
+    });
+});
+
+// Get user match history from endpoint
+router.route("/get-match-history/:username").get((req, res) => {
+    // get username from request
+    let username = req.params.username;
+    // find all matches where the user is either player 1 or player 2
+    let p = Match.find({ $or: [{ player1Name: username }, { player2Name: username }] }).exec();
+    p.then((matches) => {
+        res.status(200).send(matches);
+    });
+});
+
+// Get top ten users based on ranking
+router.route("/get-top-ten").get((req, res) => {
+    // sort users by rating and get top 10
+    let p = User.find().sort({ rating: -1 }).limit(10).exec();
+    p.then((users) => {
+        res.status(200).send(users);
     });
 });
 
