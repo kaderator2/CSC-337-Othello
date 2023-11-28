@@ -25,11 +25,11 @@ const UserSchema = new Schema({
     password: String,
     rating: Number,
     room: Number,
-    profilePhoto:
-    {
-        data: Buffer,
-        contentType: String
-    },
+    //profilePhoto:
+    //{
+    //    data: Buffer,
+    //    contentType: String
+    //},
     matches: []
 });
 
