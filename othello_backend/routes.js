@@ -138,9 +138,9 @@ router.route("/logout").get((req, res) => {
 });
 
 // Get user match history from endpoint
-router.route("/get-match-history/:username").get((req, res) => {
+router.route("/get-match-history").get((req, res) => {
     // get username from request
-    let username = req.params.username;
+    let username = req.body.username;
     // find all matches where the user is either player 1 or player 2
     let p = Match.find({ $or: [{ player1Name: username }, { player2Name: username }] }).exec();
     p.then((matches) => {
@@ -154,6 +154,19 @@ router.route("/get-top-ten").get((req, res) => {
     let p = User.find().sort({ rating: -1 }).limit(10).exec();
     p.then((users) => {
         res.status(200).send(users);
+    });
+});
+
+// (this is just a starter endpoint to get the ball rolling)
+// Allows user to change their profile photo
+router.route("/change-profile-photo").post(auth, (req, res) => {
+    // get username and profile photo from request
+    let username = req.body.username;
+    let profilePhoto = req.body.profilePhoto;
+    // find user and update profile photo
+    let p = User.findOneAndUpdate({ username: username }, { profilePhoto: profilePhoto }).exec();
+    p.then(() => {
+        res.status(200).send("Profile photo updated successfully");
     });
 });
 
