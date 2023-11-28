@@ -135,6 +135,7 @@ function Board({mode}) {
     }
 
     //TODO handle pop up or other menu on winning
+    // TODO: disconnect from socket room
     if (p1Score === p2Score) {
       alert('DRAW');
     }

@@ -140,13 +140,13 @@ router.route("/logout").get((req, res) => {
 /* Create and get room number request */
 let playerCounter = 0;
 let roomNumber = 1;
-router.route('/get-room').post((req, res) => {
+router.route('/get-room/:name').get((req, res) => {
     console.log("Getting new room number");
     // control of 2-player lobbies
 	playerCounter++;
 	roomNumber = playerCounter%3 !== 0 ? roomNumber : roomNumber+1;
 	
-	let name = req.body.username;
+	let name = req.params.name;
 	let p = User.find({ username : name }).exec();
 	p.then((results) => {
 		let user = results[0];

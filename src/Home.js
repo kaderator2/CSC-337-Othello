@@ -1,7 +1,6 @@
 import {useNavigate} from "react-router-dom";
 import { ProfilePicture, Header } from './Components';
 import React, { useState, useEffect } from 'react';
-//import { setTimeout } from "timers/promises";
 import axios from 'axios';
 import io from "socket.io-client";
 import Cookies from 'universal-cookie';
@@ -64,9 +63,9 @@ function PlayButton({ opponent }) {
 	
 	const getRoom = () => {
 		let name = getUser();
-        axios.post('http://localhost:5000/api/get-room/', { username : name })
+        axios.get('http://localhost:5000/api/get-room/' + name)
         .then((res) => {
-        	console.log("Get room res: " + res);
+        	console.log("Got room number: " + res);
         	return res;    
         })
         .catch((err) => {
