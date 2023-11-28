@@ -130,7 +130,7 @@ router.route("/logout").get((req, res) => {
             return res.status(500).send("Error logging out");
         }
 
-        // Clear the JWT token from client-side (example using cookies, modify according to your setup)
+        // Clear the JWT token from client-side
         res.clearCookie("TOKEN"); // Clear the cookie named "TOKEN" where the JWT token is stored
 
         res.status(200).send("Logout successful");
