@@ -1,4 +1,4 @@
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { ProfilePicture, Header } from './Components';
 import React, { useState, useEffect } from 'react';
 //import { setTimeout } from "timers/promises";
@@ -12,7 +12,7 @@ export var uRoom;
 function getUser() {
 	const cookies = new Cookies();
 	let username = cookies.get('name')
-	console.log(username); 
+	console.log(username);
 	return username;
 }
 
@@ -61,33 +61,33 @@ function LeaderboardButton() {
 
 function PlayButton({ opponent }) {
 	let navigate = useNavigate();
-	
+
 	const getRoom = () => {
 		let name = getUser();
-        axios.post('http://localhost:5000/api/get-room/', { username : name })
-        .then((res) => {
-        	console.log("Get room res: " + res);
-        	return res;    
-        })
-        .catch((err) => {
-			console.log("Error sending room req");
-			console.log(err);		
-		});
-    };
-	
+		axios.post('http://localhost:5000/api/get-room/', { username: name })
+			.then((res) => {
+				console.log("Get room res: " + res);
+				return res;
+			})
+			.catch((err) => {
+				console.log("Error sending room req");
+				console.log(err);
+			});
+	};
+
 	// -------- Socket.io stuffs -------------
 	//Room State
-  	const [room, setRoom] = useState("");
+	const [room, setRoom] = useState("");
 
-  	const joinRoom = () => {
-    	/*if (room !== "") {
-      		socket.emit("join_room", {room});
-    	}*/
-    	socket.emit("join_room", uRoom);
-  	};
-	
+	const joinRoom = () => {
+		/*if (room !== "") {
+				socket.emit("join_room", {room});
+		}*/
+		socket.emit("join_room", uRoom);
+	};
+
 	const goToMatch = () => {
-		if(opponent === "AI") {
+		if (opponent === "AI") {
 			navigate('/match/ai');
 		}
 		else {
