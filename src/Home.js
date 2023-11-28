@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { ProfilePicture, Header } from './Components';
+import { ProfilePicture, Header, getUsername } from './Components';
 import React, { useState, useEffect } from 'react';
 //import { setTimeout } from "timers/promises";
 import axios from 'axios';
@@ -9,12 +9,6 @@ import Cookies from 'universal-cookie';
 export const socket = io.connect("http://localhost:3001");
 export var uRoom;
 
-function getUser() {
-	const cookies = new Cookies();
-	let username = cookies.get('name')
-	console.log(username);
-	return username;
-}
 
 function HelpButton() {
 	let navigate = useNavigate();
@@ -28,10 +22,20 @@ function HelpButton() {
 }
 
 function LogoutButton() {
-	// TODO: call logout from routes.js?
 	let navigate = useNavigate();
+	const cookies = new Cookies();
 	const goToLogin = () => {
-		navigate('/');
+		// Sends get request to logout
+		axios.get('http://localhost:5000/api/logout/')
+			.then((res) => {
+				console.log("Logged out!");
+				cookies.remove('TOKEN');
+				cookies.remove('name');
+				navigate('/');
+			}).catch((err) => {
+				console.log("Error logging out");
+				console.log(err);
+			});
 	}
 
 	return (
@@ -63,7 +67,7 @@ function PlayButton({ opponent }) {
 	let navigate = useNavigate();
 
 	const getRoom = () => {
-		let name = getUser();
+		let name = getUsername();
 		axios.post('http://localhost:5000/api/get-room/', { username: name })
 			.then((res) => {
 				console.log("Get room res: " + res);
@@ -147,7 +151,7 @@ function MainHome({ id }) {
 function Home() {
 	return (
 		<div id='Home'>
-			<Header value='Welcome to Othello !' />
+			<Header value={'Welcome to Othello ' + getUsername() + '!'} />
 			<MainHome id='mainHome' />
 			<SidePanel id='sidePanel' />
 		</div>
