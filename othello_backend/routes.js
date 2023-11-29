@@ -1,5 +1,5 @@
 var express = require('express');
-const { User } = require("./schemas");
+const { User, Match } = require("./schemas");
 const { addBoardState, boardState, matchState, createMatch } = require("./gameLogic");
 const auth = require("./auth");
 const bcrypt = require('bcrypt');
@@ -123,17 +123,50 @@ router.route("/auth-endpoint").get(auth, (request, response) => {
 // Logout endpoint
 router.route("/logout").get((req, res) => {
     console.log("Logging out");
-    // Clear the session data or token (example using session, modify as per your authentication method)
+    // Clear the session data or token
     req.session.destroy((err) => {
         if (err) {
             console.log(err);
             return res.status(500).send("Error logging out");
         }
 
-        // Clear the JWT token from client-side (example using cookies, modify according to your setup)
+        // Clear the JWT token from client-side
         res.clearCookie("TOKEN"); // Clear the cookie named "TOKEN" where the JWT token is stored
 
         res.status(200).send("Logout successful");
+    });
+});
+
+// Get user match history from endpoint
+router.route("/get-match-history").get((req, res) => {
+    // get username from request
+    let username = req.body.username;
+    // find all matches where the user is either player 1 or player 2
+    let p = Match.find({ $or: [{ player1Name: username }, { player2Name: username }] }).exec();
+    p.then((matches) => {
+        res.status(200).send(matches);
+    });
+});
+
+// Get top ten users based on ranking
+router.route("/get-top-ten").get((req, res) => {
+    // sort users by rating and get top 10, projecting only necessary fields
+    let p = User.find().sort({ rating: -1 }).limit(10).select('-password').exec();
+    p.then((users) => {
+        res.status(200).send(users);
+    });
+});
+
+// (this is just a starter endpoint to get the ball rolling)
+// Allows user to change their profile photo
+router.route("/change-profile-photo").post(auth, (req, res) => {
+    // get username and profile photo from request
+    let username = req.body.username;
+    let profilePhoto = req.body.profilePhoto;
+    // find user and update profile photo
+    let p = User.findOneAndUpdate({ username: username }, { profilePhoto: profilePhoto }).exec();
+    p.then(() => {
+        res.status(200).send("Profile photo updated successfully");
     });
 });
 

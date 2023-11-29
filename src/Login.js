@@ -54,8 +54,8 @@ function Login() {
                     path: '/',
                 });
                 // set username cookie
-				cookies.set('name', username, { path: '/' });
-				
+                cookies.set('name', username, { path: '/' });
+
                 // redirect user to the auth page
                 window.location.href = '/home';
             }

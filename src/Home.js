@@ -1,18 +1,11 @@
-import {useNavigate} from "react-router-dom";
-import { ProfilePicture, Header } from './Components';
+import { useNavigate } from "react-router-dom";
+import { ProfilePicture, Header, getUsername } from './Components';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import io from "socket.io-client";
 import Cookies from 'universal-cookie';
 
 export const socket = io.connect("http://localhost:3001");
-//export var uRoom;
-
-function getUser() {
-	const cookies = new Cookies();
-	let username = cookies.get('name'); 
-	return username;
-}
 
 function HelpButton() {
 	let navigate = useNavigate();
@@ -26,10 +19,20 @@ function HelpButton() {
 }
 
 function LogoutButton() {
-	// TODO: call logout from routes.js?
 	let navigate = useNavigate();
+	const cookies = new Cookies();
 	const goToLogin = () => {
-		navigate('/');
+		// Sends get request to logout
+		axios.get('http://localhost:5000/api/logout/')
+			.then((res) => {
+				console.log("Logged out!");
+				cookies.remove('TOKEN');
+				cookies.remove('name');
+				navigate('/');
+			}).catch((err) => {
+				console.log("Error logging out");
+				console.log(err);
+			});
 	}
 
 	return (
@@ -59,13 +62,13 @@ function LeaderboardButton() {
 
 function PlayButton({ opponent }) {
 	let navigate = useNavigate();
-	
+
 	const goToMatch = () => {
-		if(opponent === "AI") {
+		if (opponent === "AI") {
 			navigate('/match/ai');
 		}
 		else {
-			let name = getUser();
+			let name = getUsername();
 	        axios.get('http://localhost:5000/api/queue/' + name)
 	        .then(() => {
 				   navigate('/lobby');
@@ -125,7 +128,7 @@ function MainHome({ id }) {
 function Home() {
 	return (
 		<div id='Home'>
-			<Header value='Welcome to Othello !' />
+			<Header value={'Welcome to Othello ' + getUsername() + '!'} />
 			<MainHome id='mainHome' />
 			<SidePanel id='sidePanel' />
 		</div>

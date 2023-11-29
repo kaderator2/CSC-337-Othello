@@ -1,107 +1,61 @@
-import React from 'react';
-import {useNavigate} from "react-router-dom";
-import {BackButton} from './Components';
+import React, { useState, useEffect } from 'react';
+import { BackButton } from './Components';
+import axios from 'axios';
 
-function RankTable({list}){
+function RankTable({ list }) {
+	const [topTenPlayers, setTopTenPlayers] = useState([]);
+	const [isLoading, setIsLoading] = useState(true);
+
+	useEffect(() => {
+		axios.get('http://localhost:5000/api/get-top-ten')
+			.then((res) => {
+				// Assuming res.data contains the array of top ten users
+				setTopTenPlayers(res.data);
+			})
+			.catch((err) => {
+				console.log(err);
+			})
+			.finally(() => {
+				setIsLoading(false);
+			});
+	}, []);
+
+	if (isLoading) {
+		return <div>Loading...</div>; // Render loading indicator while loading top 10 players
+	}
+
 	return (
-        <div>
-            <table id='rankTable'>
-            	<thead>
-	            	<tr>
-	            		<th> Rank </th>
-	            		<th> Player Name </th>
-	            		<th> Rating </th>
-	            	</tr>
-            	</thead>
-            	<tbody>
-	            	<tr className='lbRow'>
-	            		{/* Possible way to do rankings 
-	            		<td> 1 </td>
-	            		<td> {list[0].username} </td>
-	            		<td> {list[0].rating} </td> */}
-	            		<td> 1 </td>
-	            		<td> . </td>
-	            		<td> 0 </td>
-	            	</tr>
-	            	<tr className='lbRow'>
-	            		<td> 2 </td>
-	            		<td> . </td>
-	            		<td> 0 </td>
-	            	</tr>
-	            	<tr className='lbRow'>
-	            		<td> 3 </td>
-	            		<td> . </td>
-	            		<td> 0 </td>
-	            	</tr>
-	            	<tr className='lbRow'>
-	            		<td> 4 </td>
-	            		<td> . </td>
-	            		<td> 0 </td>
-	            	</tr>
-	            	<tr className='lbRow'>
-	            		<td> 5 </td>
-	            		<td> . </td>
-	            		<td> 0 </td>
-	            	</tr>
-	            	<tr className='lbRow'>
-	            		<td> 6 </td>
-	            		<td> . </td>
-	            		<td> 0 </td>
-	            	</tr>
-	            	<tr className='lbRow'>
-	            		<td> 7 </td>
-	            		<td> . </td>
-	            		<td> 0 </td>
-	            	</tr>
-	            	<tr className='lbRow'>
-	            		<td> 8 </td>
-	            		<td> . </td>
-	            		<td> 0 </td>
-	            	</tr>
-	            	<tr className='lbRow'>
-	            		<td> 9 </td>
-	            		<td> . </td>
-	            		<td> 0 </td>
-	            	</tr>
-	            	<tr className='lbRow'>
-	            		<td> 10 </td>
-	            		<td> . </td>
-	            		<td> 0 </td>
-	            	</tr>
-	            </tbody>
-            </table>
-        </div>
-    );
+		<div>
+			<table id='rankTable'>
+				<thead>
+					<tr>
+						<th> Rank </th>
+						<th> Player Name </th>
+						<th> Rating </th>
+					</tr>
+				</thead>
+				<tbody>
+					{topTenPlayers.map((player, index) => (
+						<tr className='lbRow' key={player._id}>
+							<td> {index + 1} </td>
+							<td> {player.username} </td>
+							<td> {player.rating} </td>
+						</tr>
+					))}
+				</tbody>
+			</table>
+		</div>
+	);
 }
 
 function Leaderboard() {
-	function getTopPlayers(){
-		{/* List of Objects with username and rating */}
-		let list;	
-		let url = 'http://localhost:5000/getTopPlayers/';
-		{/*
-		let p = fetch(url);
-		p.then((results) =>{
-			for(let i=0; i<results.length; i++){
-				let player = {name : results[i].username, rating : results[i].rating};
-				list.push(player);
-			}
-			return list;
-		})
-		.catch((err) =>{
-			console.log('Error getting top players for leaderboard');
-			console.log(err);
-		});
-		*/}
-	}
-	
-    return (
-        <div>
-            <h1>Top Ranked Players</h1>
-            <RankTable />
-            <BackButton />
-        </div>
-    );
+	return (
+		<div>
+			<h1>Top Ranked Players</h1>
+			<RankTable />
+			<BackButton />
+		</div>
+	);
 }
 
 export default Leaderboard;

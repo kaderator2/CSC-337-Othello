@@ -1,7 +1,7 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import {Header, BackButton, PlayerData} from './Components';
+import { Header, BackButton, PlayerData } from './Components';
 
 const pieces = {
   0: 'open',
@@ -13,19 +13,19 @@ const pieces = {
 const playerSide = 1;
 const oppSide = playerSide === 1 ? 2 : 1;
 
-function Board({mode}) {
+function Board({ mode }) {
   var toPlay = 1;
   var move = 1;
-  
+
   var squares = [
-    [0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0],
-    [0,0,0,2,1,0,0,0],
-    [0,0,0,1,2,0,0,0],
-    [0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0]
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 2, 1, 0, 0, 0],
+    [0, 0, 0, 1, 2, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
   ];
   var tempSquares;
 
@@ -33,7 +33,7 @@ function Board({mode}) {
   var matchData;
   var currentBoardData;
 
-  useEffect(()=>{
+  useEffect(() => {
     var interval;
     axios.get('http://localhost:5000/api/create-match/').then((res) => {
       matchID = res.data;
@@ -55,12 +55,12 @@ function Board({mode}) {
   }, []);
 
   function handleClick(row, col) {
-    if(toPlay === playerSide) {
+    if (toPlay === playerSide) {
       tempSquares = structuredClone(squares);
-      if(checkMoveAllowed(row, col, true)) {
+      if (checkMoveAllowed(row, col, true)) {
         axios.post('http://localhost:5000/api/add-board-state', {
-          match: matchID, 
-          board: tempSquares, 
+          match: matchID,
+          board: tempSquares,
           move: move + 1,
           toMove: toPlay === 1 ? 2 : 1
         }).then((boardRes) => {
@@ -73,8 +73,8 @@ function Board({mode}) {
               setTimeout(() => {
                 computerTurn();
                 axios.post('http://localhost:5000/api/add-board-state', {
-                  match: matchID, 
-                  board: tempSquares, 
+                  match: matchID,
+                  board: tempSquares,
                   move: currentBoardData.moveNumber + 1,
                   toMove: toPlay === 1 ? 2 : 1
                 }).then((boardRes) => {
@@ -103,7 +103,7 @@ function Board({mode}) {
         }
       }
     }
-    let space = allowedSpaces[Math.floor(Math.random()*allowedSpaces.length)];
+    let space = allowedSpaces[Math.floor(Math.random() * allowedSpaces.length)];
     checkMoveAllowed(space[0], space[1], true);
   }
 
@@ -149,7 +149,7 @@ function Board({mode}) {
   //use check to see if the move is allowed (would result in outflank)
   function checkMoveAllowed(row, col, attemptMove) {
     let allowed = false;
-    if(tempSquares[row][col] === 0) {
+    if (tempSquares[row][col] === 0) {
       if (checkMoveOnLine(row, col, 1, 0, attemptMove)) {
         allowed = true;
       }
@@ -217,15 +217,15 @@ function Board({mode}) {
   const [game, setGame] = useState([]);
   const dimension = 8;
 
-  const loadGameBoard = ()=> {
+  const loadGameBoard = () => {
     let arr = [];
 
-    for (let i=0;i<dimension;i++){
+    for (let i = 0; i < dimension; i++) {
       let temp = [];
-      for (let j=0;j<dimension;j++){
-          temp.push(<div id={i.toString() + j.toString()} className='board_square' onClick={() => handleClick(i,j)}>
-            <div className={'piece ' + pieces[squares[i][j]]}></div>
-          </div>);
+      for (let j = 0; j < dimension; j++) {
+        temp.push(<div id={i.toString() + j.toString()} className='board_square' onClick={() => handleClick(i, j)}>
+          <div className={'piece ' + pieces[squares[i][j]]}></div>
+        </div>);
       }
       arr.push(temp);
     }
@@ -233,9 +233,9 @@ function Board({mode}) {
     setGame(arr);
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     loadGameBoard();
-  },[]);
+  }, []);
 
   return (
     <div className='board'>
@@ -247,21 +247,21 @@ function Board({mode}) {
   );
 }
 
-function Match({mode}) {
+function Match({ mode }) {
   return (
-      <div>
-        <BackButton />
-        <Header value='Match' />
-        <div className='match_container centered_container'>
-          <div className='game_container centered_section'>
-            <PlayerData id='top_player' name='test' rating='1400' />
-            <PlayerData id='bottom_player' name='test2' rating='1450' />
-            <div className="game">
-              <Board mode={mode}/>
-            </div>
+    <div>
+      <BackButton />
+      <Header value='Match' />
+      <div className='match_container centered_container'>
+        <div className='game_container centered_section'>
+          <PlayerData id='top_player' name='test' rating='1400' />
+          <PlayerData id='bottom_player' name='test2' rating='1450' />
+          <div className="game">
+            <Board mode={mode} />
           </div>
         </div>
       </div>
+    </div>
   );
 }
 
