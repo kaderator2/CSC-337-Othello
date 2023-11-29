@@ -16,7 +16,7 @@ const MatchSchema = new Schema({
     player2Name: String,
     player1Rating: Number,
     player2Rating: Number,
-    winner: Number,
+    winner: String,
     boardStates: []
 });
 

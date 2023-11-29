@@ -2,7 +2,9 @@
  * This file contains the logic for the game.
  * It is responsible for creating new matches, adding board states to matches, and getting board states from matches.
  */
-const { User, Board, Match } = require("./schemas");
+
+const {User, Match, Board} = require('./schemas.js');
+
 async function createMatch(req, res) {
     try {
         const startingState = [
@@ -26,8 +28,8 @@ async function createMatch(req, res) {
 
         //TODO get player names and ratings somehow
         const match = new Match({
-            player1Name: req.body.p1Username,
-            player2Name: req.body.p2Username,
+            player1Name: req.query.p1Username,
+            player2Name: req.query.p2Username,
             player1Rating: 123,
             player2Rating: 345,
             winner: 0,
@@ -95,4 +97,21 @@ async function addBoardState(req, res) {
     }
 }
 
-module.exports = { addBoardState, boardState, matchState, createMatch };
+async function updateWinner(req, res) {
+    try {
+        var match = await Match.findOne({ _id: req.body.matchID }).exec();
+
+        match.winner = req.body.winner;
+        match.markModified('winner');
+        await match.save();
+        console.log(req.body.matchID);
+        console.log(req.body.winner);
+        console.log("winner updated");
+        res.end('WINNER UPDATE SUCCESS');
+    } catch (error) {
+        console.log(error);
+        res.status(500).send(error);
+    }
+}
+
+module.exports = { addBoardState, boardState, matchState, createMatch, updateWinner };

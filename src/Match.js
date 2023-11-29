@@ -13,6 +13,7 @@ const pieces = {
 //TODO assign each player a different color
 const playerSide = 1;
 const oppSide = playerSide === 1 ? 2 : 1;
+var oppName = '';
 
 function Board({ mode }) {
   var toPlay = 1;
@@ -36,7 +37,6 @@ function Board({ mode }) {
 
   useEffect(() => {
     var interval;
-    var oppName;
     if (mode === 'AI') {
       oppName = 'AI';
     }
@@ -45,9 +45,10 @@ function Board({ mode }) {
       oppName = 'opponent';
     }
     axios.get('http://localhost:5000/api/create-match/', {
-      p1Username: getUsername(),
-      p2Username: oppName()
-
+      params: {
+        p1Username: getUsername(),
+        p2Username: oppName
+      }
     }).then((res) => {
       matchID = res.data;
       interval = setInterval(function () {
@@ -150,12 +151,40 @@ function Board({ mode }) {
     //TODO handle pop up or other menu on winning
     // TODO: disconnect from socket room
     if (p1Score === p2Score) {
+      axios.post('http://localhost:5000/api/update-winner', {
+          winner: 'DRAW',
+          matchID: matchID
+        });
       alert('DRAW');
     }
     else if (p1Score > p2Score) {
+      if(playerSide === 1) {
+        axios.post('http://localhost:5000/api/update-winner', {
+          winner: getUsername(),
+          matchID: matchID
+        });
+      }
+      else {
+        axios.post('http://localhost:5000/api/update-winner', {
+          winner: oppName,
+          matchID: matchID
+        });
+      }
       alert('BLACK WINS');
     }
     else {
+      if(playerSide === 2) {
+        axios.post('http://localhost:5000/api/update-winner', {
+          winner: oppName,
+          matchID: matchID
+        });
+      }
+      else {
+        axios.post('http://localhost:5000/api/update-winner', {
+          winner: getUsername(),
+          matchID: matchID
+        });
+      }
       alert('WHITE WINS');
     }
   }

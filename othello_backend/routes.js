@@ -1,6 +1,6 @@
 var express = require('express');
 const { User, Match } = require("./schemas");
-const { addBoardState, boardState, matchState, createMatch } = require("./gameLogic");
+const { addBoardState, boardState, matchState, createMatch, updateWinner } = require("./gameLogic");
 const auth = require("./auth");
 const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken");
@@ -140,11 +140,15 @@ router.route("/logout").get((req, res) => {
 // Get user match history from endpoint
 router.route("/get-match-history").get((req, res) => {
     // get username from request
-    let username = req.body.username;
+    let username = req.query.username;
     // find all matches where the user is either player 1 or player 2
     let p = Match.find({ $or: [{ player1Name: username }, { player2Name: username }] }).exec();
     p.then((matches) => {
-        res.status(200).send(matches);
+        if (matches) {
+            console.log(matches);
+            res.status(200).send(JSON.stringify(matches));
+        }
+        res.end('ERROR');
     });
 });
 
@@ -235,6 +239,11 @@ router.route('/board-state/:board_id').get((req, res) => {
 router.route('/add-board-state').post((req, res) => {
     console.log("adding board state");
     addBoardState(req, res);
+});
+
+router.route('/update-winner').post((req, res) => {
+    console.log("updating winner");
+    updateWinner(req, res);
 });
 
 module.exports = router;
