@@ -45,10 +45,8 @@ function ReplaySection() {
     const loadReplaySection = () => {
         let arr = [];
 
-        console.log(matchData);
         for (let i = matchData.length - 1, count = 0; i >= 0 && count < 10; i--, count++) {
             let average = (matchData[i].player1Rating + matchData[i].player2Rating) / 2;
-            console.log(average);
             arr.push(<Replay id={i} player1={matchData[i].player1Name} player2={matchData[i].player2Name}
                 ratingAvg={average} winner={matchData[i].winner} />);
         }
