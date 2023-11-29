@@ -71,7 +71,7 @@ function PlayButton({ opponent }) {
 			let name = getUsername();
 	        axios.get('http://localhost:5000/api/queue/' + name)
 	        .then(() => {
-				   navigate('/lobby');
+				navigate('/lobby');
 	        })
 	        .catch((err) => {
 					console.log(err);

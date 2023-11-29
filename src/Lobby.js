@@ -1,19 +1,19 @@
 import React from 'react';
-import { Header } from './Components';
+import { Header, getUsername } from './Components';
 import {useNavigate} from "react-router-dom";
 import { socket } from './Home';
 import axios from 'axios';
 
-var room;
+export var room;
 
-function BackButtonLobby(){
+/* BackButton like in Components but leaves socket room */
+export function BackButtonLobby(){
 	let navigate = useNavigate();
   	
     const action = () => {
 		socket.emit("leave_room", room);
-		axios.get('http://localhost:5000/api/leave-room/' + getUser())
+		axios.get('http://localhost:5000/api/leave-room/' + getUsername())
 		.then(() => {
-			console.log("Room left successfully");
 			navigate('/home');
       	})
       	.catch((err) => {
@@ -32,12 +32,13 @@ function BackButtonLobby(){
 function Lobby() {
 	let navigate = useNavigate();
 	let inGame = false;
+	let name = getUsername();
 	
 	function matched(){
 		if(inGame)
 			return;
 		else {
-			axios.get('http://localhost:5000/api/check-queue/')
+			axios.get('http://localhost:5000/api/check-queue/' + name)
 			.then((res) => {
 				room = res.data;
 				if(room !== 0) {	// 0 means match not found

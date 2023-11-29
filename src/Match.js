@@ -2,6 +2,7 @@ import React from 'react';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Header, BackButton, PlayerData } from './Components';
+import { BackButtonLobby, room } from './Lobby';
 
 const pieces = {
   0: 'open',
@@ -250,7 +251,7 @@ function Board({ mode }) {
 function Match({ mode }) {
   return (
     <div>
-      <BackButton />
+      <BackButtonLobby />
       <Header value='Match' />
       <div className='match_container centered_container'>
         <div className='game_container centered_section'>

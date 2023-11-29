@@ -180,28 +180,27 @@ router.route('/queue/:name').get((req, res) => {
 		queue.push(user);
 		res.status(200).send("SUCESS");
     })
-	    .catch((err) => {
-	     	console.log("Error finding user when queueing");
-	        console.log(err);
-	     });
 });
 
-/* Match players when there are 2 in the queue, return room number */
-router.route('/check-queue').get((req, res) => {
-    if(queue >= 2){
+/* Match players when there are 2 in the queue, return room number
+   of the player passed in as a parameter */
+router.route('/check-queue/:name').get((req, res) => {
+	let name = req.params.name;
+	//console.log("Q length: " + queue.length);
+    if(queue.length >= 2){
 		queue[0].room = roomNumber;
 		queue[1].room = roomNumber;
 		queue[0].save().then(() => {
 			queue[1].save().then(() => {
 				queue.splice(0,2);
 				roomNumber++;
-				res.status(200).send(''+roomNumber);	// send as String
-			})
-        })
+			}).catch((err) => {console.log(err);});
+        }).catch((err) => {console.log(err);});
 	}
-	else{
-		res.status(200).send(''+0);
-	}
+	User.findOne({ username: name })
+    .then((user) => {
+		res.status(200).send(''+(user.room));	// send as String
+    });
 });
 
 /* Remove player from room and room from User */
