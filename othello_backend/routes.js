@@ -137,45 +137,51 @@ router.route("/logout").get((req, res) => {
     });
 });
 
-/* Create and get room number request */
-let playerCounter = 0;
+/* Queue up the player with the given name */
+let queue = [];
 let roomNumber = 1;
-router.route('/get-room/:name').get((req, res) => {
-    console.log("Getting new room number");
-    // control of 2-player lobbies
-    playerCounter++;
-    roomNumber = playerCounter % 3 !== 0 ? roomNumber : roomNumber + 1;
-
-    let name = req.body.username;
-    let p = User.find({ username: name }).exec();
-    p.then((results) => {
-        let user = results[0];
-        user.room = roomNumber;
-        user.save().then(() => {
-            console.log("saved user room successfully");
-        }).catch((err) => { console.log(err); });
+router.route('/queue/:name').get((req, res) => {
+    let name = req.params.name;
+    User.findOne({ username: name })
+    .then((user) => {
+		queue.push(user);
+		res.status(200).send("SUCESS");
     })
-        .catch((err) => {
-            console.log("Error finding user when getting room");
-            console.log(err);
-        });
-
-    console.log('Joining room ' + roomNumber + ' from server');
-    res.status(200).send(roomNumber);
+	    .catch((err) => {
+	     	console.log("Error finding user when queueing");
+	        console.log(err);
+	     });
 });
 
-/* Request for getting players in a room */
-router.route('/room-size/:room').get((req, res) => {
-    let roomNumber = req.params.room;
-    console.log("getting number of players in room " + roomNumber);
-    let p = User.find({ room: roomNumber });
-    p.then((users) => {
-        res.status(200).send(users.length);
+/* Match players when there are 2 in the queue, return room number */
+router.route('/check-queue').get((req, res) => {
+    if(queue >= 2){
+		queue[0].room = roomNumber;
+		queue[1].room = roomNumber;
+		queue[0].save().then(() => {
+			queue[1].save().then(() => {
+				queue.splice(0,2);
+				roomNumber++;
+				res.status(200).send(''+roomNumber);	// send as String
+			})
+        })
+	}
+	else{
+		res.status(200).send(''+0);
+	}
+});
+
+/* Remove player from room and room from User */
+router.route('/leave-room/:name').get((req, res) => {
+    let name = req.params.name;
+    User.findOne({ username: name })
+    .then((user) => {
+		queue.splice(queue.indexOf(user), 1);
+        user.room = 0;
+        user.save().then(() => {
+    		res.status(200).send(''+roomNumber);	// send as String
+        }).catch((err) => { console.log(err); });
     })
-        .catch((err) => {
-            console.log("Error getting users in room " + roomNumber);
-            console.log(err);
-        });
 });
 
 /* Match data requests */

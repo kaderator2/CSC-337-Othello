@@ -6,12 +6,11 @@ import io from "socket.io-client";
 import Cookies from 'universal-cookie';
 
 export const socket = io.connect("http://localhost:3001");
-export var uRoom;
+//export var uRoom;
 
 function getUser() {
 	const cookies = new Cookies();
-	let username = cookies.get('name')
-	console.log(username); 
+	let username = cookies.get('name'); 
 	return username;
 }
 
@@ -61,39 +60,19 @@ function LeaderboardButton() {
 function PlayButton({ opponent }) {
 	let navigate = useNavigate();
 	
-	const getRoom = () => {
-		let name = getUser();
-        axios.get('http://localhost:5000/api/get-room/' + name)
-        .then((res) => {
-        	console.log("Got room number: " + res);
-        	return res;    
-        })
-        .catch((err) => {
-			console.log("Error sending room req");
-			console.log(err);		
-		});
-    };
-	
-	// -------- Socket.io stuffs -------------
-	//Room State
-  	const [room, setRoom] = useState("");
-
-  	const joinRoom = () => {
-    	/*if (room !== "") {
-      		socket.emit("join_room", {room});
-    	}*/
-    	socket.emit("join_room", uRoom);
-  	};
-	
 	const goToMatch = () => {
 		if(opponent === "AI") {
 			navigate('/match/ai');
 		}
 		else {
-			uRoom = getRoom();
-			setRoom(uRoom);
-			joinRoom();
-			navigate('/lobby');
+			let name = getUser();
+	        axios.get('http://localhost:5000/api/queue/' + name)
+	        .then(() => {
+				   navigate('/lobby');
+	        })
+	        .catch((err) => {
+					console.log(err);
+			});		
 		}
 	}
 	return (

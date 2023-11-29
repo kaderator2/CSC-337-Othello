@@ -1,15 +1,24 @@
 import React from 'react';
 import { Header } from './Components';
 import {useNavigate} from "react-router-dom";
-import { uRoom, socket } from './Home';
+import { socket } from './Home';
 import axios from 'axios';
+
+var room;
 
 function BackButtonLobby(){
 	let navigate = useNavigate();
   	
     const action = () => {
-		socket.emit("leave_room", uRoom);
-        navigate('/home');
+		socket.emit("leave_room", room);
+		axios.get('http://localhost:5000/api/leave-room/' + getUser())
+		.then(() => {
+			console.log("Room left successfully");
+			navigate('/home');
+      	})
+      	.catch((err) => {
+			console.log(err);  
+		});
     }
 
     return (
@@ -28,23 +37,23 @@ function Lobby() {
 		if(inGame)
 			return;
 		else {
-			axios.get('http://localhost:5000/api/room-size/' + uRoom)
-			.then((size) => {
-				console.log("Room size of " + uRoom + ": " + size);
-				console.log("Typeof 'size':" + typeof size);
-				if(size === 2) {
+			axios.get('http://localhost:5000/api/check-queue/')
+			.then((res) => {
+				room = res.data;
+				if(room !== 0) {	// 0 means match not found
 					inGame = true;
+					socket.emit("join_room", room);
 					navigate('/match/pvp'); // TODO: maybe add room number in path	
 				}
           	})
           	.catch((err) => {
-				console.log("Error sending room size request");
+				console.log("Error sending check-queue request");
 				console.log(err);  
 			});		
 		}
 	};
 	
-	setInterval(matched, 5000);
+	setInterval(matched, 2000);
 	
     return (
         <div>
