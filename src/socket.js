@@ -21,12 +21,12 @@ io.on("connection", (socket) => {
 
  	socket.on("join_room", (data) => {
 		console.log('Joined room ' + data);
-    	socket.join(data.room);
+    	socket.join(data);
   	});
   	
   	socket.on("leave_room", (data) => {
     	console.log('Left room ' + data);
-    	socket.leave(data.room);
+    	socket.leave(data);
   	});
 });
 
