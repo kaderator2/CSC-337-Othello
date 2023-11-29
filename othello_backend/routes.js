@@ -1,5 +1,5 @@
 var express = require('express');
-const { User } = require("./schemas");
+const { User, Match } = require("./schemas");
 const { addBoardState, boardState, matchState, createMatch } = require("./gameLogic");
 const auth = require("./auth");
 const bcrypt = require('bcrypt');
@@ -150,8 +150,8 @@ router.route("/get-match-history").get((req, res) => {
 
 // Get top ten users based on ranking
 router.route("/get-top-ten").get((req, res) => {
-    // sort users by rating and get top 10
-    let p = User.find().sort({ rating: -1 }).limit(10).exec();
+    // sort users by rating and get top 10, projecting only necessary fields
+    let p = User.find().sort({ rating: -1 }).limit(10).select('-password').exec();
     p.then((users) => {
         res.status(200).send(users);
     });
