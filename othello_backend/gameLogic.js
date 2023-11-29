@@ -26,8 +26,8 @@ async function createMatch(req, res) {
 
         //TODO get player names and ratings somehow
         const match = new Match({
-            player1Name: 'test',
-            player2Name: 'test2',
+            player1Name: req.body.p1Username,
+            player2Name: req.body.p2Username,
             player1Rating: 123,
             player2Rating: 345,
             winner: 0,

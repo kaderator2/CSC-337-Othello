@@ -1,7 +1,7 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Header, BackButton, PlayerData } from './Components';
+import { Header, BackButton, PlayerData, getUsername } from './Components';
 
 const pieces = {
   0: 'open',
@@ -35,7 +35,19 @@ function Board({ mode }) {
 
   useEffect(() => {
     var interval;
-    axios.get('http://localhost:5000/api/create-match/').then((res) => {
+    var oppName;
+    if (mode === 'AI') {
+      oppName = 'AI';
+    }
+    else {
+      //TODO get actual other name here
+      oppName = 'opponent';
+    }
+    axios.get('http://localhost:5000/api/create-match/', {
+      p1Username: getUsername(),
+      p2Username: oppName()
+
+    }).then((res) => {
       matchID = res.data;
       interval = setInterval(function () {
         axios.get('http://localhost:5000/api/match-state/' + matchID).then((matchRes) => {
@@ -253,8 +265,8 @@ function Match({ mode }) {
       <Header value='Match' />
       <div className='match_container centered_container'>
         <div className='game_container centered_section'>
-          <PlayerData id='top_player' name='test' rating='1400' />
-          <PlayerData id='bottom_player' name='test2' rating='1450' />
+          <PlayerData id='top_player' name={oppName} rating='1400' />
+          <PlayerData id='bottom_player' name={getUsername()} rating='1450' />
           <div className="game">
             <Board mode={mode} />
           </div>
