@@ -19,7 +19,7 @@ function PlayerSection() {
 
 function ReplaySection() {
     const [replays, setReplay] = useState([]);
-    var matchData = {
+    var matchesData = {
         player1Name: '',
         player2Name: '',
         player1Rating: 0,
@@ -34,21 +34,19 @@ function ReplaySection() {
                     username: getUsername()
                 }
             }).then((matches) => {
-                matchData = matches.data;
+                matchesData = matches.data;
             });
 
             loadReplaySection();
-        }, 1000);
+        }, 300);
         return () => clearInterval(interval);
     }, []);
 
     const loadReplaySection = () => {
         let arr = [];
 
-        for (let i = matchData.length - 1, count = 0; i >= 0 && count < 10; i--, count++) {
-            let average = (matchData[i].player1Rating + matchData[i].player2Rating) / 2;
-            arr.push(<Replay id={i} player1={matchData[i].player1Name} player2={matchData[i].player2Name}
-                ratingAvg={average} winner={matchData[i].winner} />);
+        for (let i = matchesData.length - 1, count = 0; i >= 0 && count < 10; i--, count++) {
+            arr.push(<Replay id={i} matchData={matchesData[i]}/>);
         }
 
         setReplay(arr);
@@ -69,19 +67,20 @@ function ReplaySection() {
     );
 }
 
-function Replay ({player1, player2, ratingAvg, winner}) {
+function Replay ({matchData}) {
     let navigate = useNavigate();
     const goToReplay = () => {
-        navigate('/replay');
+        navigate('/replay', {state:{matchData: matchData}});
         //TODO implement sending data about specific replay
     }
+
     return (
         <div className='replay centered_container' onClick={goToReplay}>
             <img src={require('./images/replay.png')} alt='A replay symbol'
                 className='replay_details image_contain centered_section' width='50' />
-            <p className='replay_details centered_section'><b>Players:</b> {player1}, {player2}</p>
-            <p className='replay_details centered_section'><b>Average rating:</b> {ratingAvg}</p>
-            <p className='replay_details centered_section'><b>Winner:</b> {winner}</p>
+            <p className='replay_details centered_section'><b>Players:</b> {matchData.player1Name}, {matchData.player2Name}</p>
+            <p className='replay_details centered_section'><b>Average rating:</b> {(matchData.player1Rating + matchData.player2Rating) / 2}</p>
+            <p className='replay_details centered_section'><b>Winner:</b> {matchData.winner}</p>
         </div>
     );
 }
