@@ -21,12 +21,12 @@ function Board({ mode }) {
 
   const userRef = useRef({
     data: {
-      rating: 1000
+      rating: '?'
     }
   });
   const oppRef = useRef({
     data: {
-      rating: 1000
+      rating: '?'
     }
   });
 
@@ -56,7 +56,7 @@ function Board({ mode }) {
       oppName = 'opponent';
     }
 
-    //Get data for the current player
+    //Get data for the current user
     axios.get('http://localhost:5000/api/get-user-data', {
       params: {
         name: getUsername()

@@ -24,13 +24,12 @@ const UserSchema = new Schema({
     username: String,
     password: String,
     rating: Number,
-    room: Number,
+    room: Number
     //profilePhoto:
     //{
     //    data: Buffer,
     //    contentType: String
     //},
-    matches: []
 });
 
 var Board = mongoose.model('Board', BoardSchema);
