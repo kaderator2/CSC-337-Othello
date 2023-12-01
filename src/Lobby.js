@@ -20,6 +20,7 @@ export function BackButtonLobby({from}){
 		socket.emit("leave_room", {room:room, name:getUsername()});
 		navigate('/home');
 		
+		console.log("from: " + from);
 		if({from} === "Match"){
 			//TODO opponent wins (change ratings)
 			socket.emit("alert_opp", room);
@@ -45,7 +46,8 @@ function Lobby() {
 	socket.on("found_match", (obj) => {
 		// query to find the room
 		let allPlayers = obj.allPlayers;
-		let foundObj = allPlayers.find(obj => obj.p1.player === getUsername());
+		let foundObj = allPlayers.find(obj => obj.p1.player === getUsername() || obj.p2.player === getUsername());
+		console.log(foundObj);
 		room = foundObj.p1.room;
 		socket.emit("join_room", room);
 		navigate('/match/pvp'); // TODO: maybe add room number in path	

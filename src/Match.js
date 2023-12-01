@@ -20,11 +20,11 @@ socket.on("found_match", (res) => {
 	getUser = getUsername();
     let allPlayers = res.allPlayers;
     let foundObj = allPlayers.find(obj => obj.p1.player === getUser || obj.p2.player === getUser);
-    console.log(foundObj);
     foundObj.p1.player === getUser ? oppName = foundObj.p2.player : oppName = foundObj.p1.player;
     foundObj.p1.player === getUser ? playerSide = 1 : playerSide = 2;
     //foundObj.p1.player === getUser ? color = foundObj.p1.color : color = foundObj.p2.color;
-    console.log(playerSide);
+    console.log("User: " + getUser);
+    console.log("Opp: " + oppName);
 });
 
 function Board({ mode }) {
@@ -63,10 +63,6 @@ function Board({ mode }) {
     if (mode === 'AI') {
       oppName = 'AI';
       playerSide = 1;
-    }
-    else {
-      // get opponent name - buggy
-      
     }
 
     //Get data for the current player
@@ -109,28 +105,32 @@ function Board({ mode }) {
   }, []);
 
   async function getOppData () {
+	var opp;
     if (oppName === 'AI') {
-      var opp = {
+      opp = {
         data: {
           username: 'AI',
           rating: 800
         }
       }
+	  return opp;
     }
     else {
-      axios.get('http://localhost:5000/api/get-user-data', {
+	  return new Promise((resolve, reject) => {
+	  	axios.get('http://localhost:5000/api/get-user-data', {
         params: {
           name: oppName
         }
-      }).then((user) => {
-          var opp = user;
-      });
+	    }).then((user) => {
+	        opp = user;
+		    return resolve(opp);
+	    });
+	 });
     }
-    return opp;
   }
 
   function handleClick(row, col) {
-	console.log("toPlay: " + toPlay + "playerSide: " + playerSide);
+	console.log("toPlay: " + toPlay + " playerSide: " + playerSide);
     if (toPlay === playerSide) {
       tempSquares = structuredClone(squares);
       if (checkMoveAllowed(row, col, true)) {
@@ -173,21 +173,23 @@ function Board({ mode }) {
   }
   
   socket.on('opp_move', (res) => {
-	console.log("received opp_move");
 	if (toPlay !== playerSide) {  
 		setTimeout(() => {  
+			tempSquares = structuredClone(squares);
 		    if (checkMoveAllowed(res.row, res.col, true)){
-			    axios.post('http://localhost:5000/api/add-board-state', {
-			      match: matchID,
-			      board: tempSquares,
-			      move: currentBoardData.moveNumber + 1,
-			      toMove: toPlay === 1 ? 2 : 1
-			    }).then((boardRes) => {
-			      toPlay = toPlay === 1 ? 2 : 1;
-			      if (checkGameEnd()) {
-			        endGame();
-			      }
-			    });
+				if(currentBoardData){
+				    axios.post('http://localhost:5000/api/add-board-state', {
+				      match: matchID,
+				      board: tempSquares,
+				      move: currentBoardData.moveNumber + 1,
+				      toMove: toPlay === 1 ? 2 : 1
+				    }).then((boardRes) => {
+				      toPlay = toPlay === 1 ? 2 : 1;
+				      if (checkGameEnd()) {
+				        endGame();
+				      }
+				    });
+			    }
 		    }
 	    }, 1000);
     }
@@ -243,7 +245,7 @@ function Board({ mode }) {
       }
     }
     //TODO handle pop up or other menu on winning
-    // TODO: disconnect from socket room
+    // TODO: user wins on opponent disconnect
     if (p1Score === p2Score) {
       axios.post('http://localhost:5000/api/update-winner', {
         winner: 'DRAW',

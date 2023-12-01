@@ -1,5 +1,3 @@
-//import Cookies from 'universal-cookie';
-
 var express = require('express');
 const { User, Match } = require("./schemas");
 const { addBoardState, boardState, matchState, createMatch, updateWinner, updateRating } = require("./gameLogic");
@@ -170,7 +168,8 @@ router.route("/get-user-data").get((req, res) => {
     p.then((user) => {
         console.log(user);
         res.status(200).send(user);
-    });
+    })
+    .catch((err) => {console.log(err);});
 });
 
 // (this is just a starter endpoint to get the ball rolling)
