@@ -1,17 +1,41 @@
 import React from 'react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Default, { Header, BackButton, getUsername } from './Components'
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 
 function PlayerSection() {
+    const [rating, setRating] = useState('?');
+    const [matchTotal, setMatchTotal] = useState('?');
+
+    useEffect(() => {
+        //Get data for the current user
+        axios.get('http://localhost:5000/api/get-user-data', {
+            params: {
+            name: getUsername()
+            }
+        }).then((user) => {
+            console.log(user.data);
+            setRating(user.data.rating);
+        });
+
+        axios.get('http://localhost:5000/api/get-match-history', {
+            params: {
+                username: getUsername()
+            }
+        }).then((matches) => {
+            console.log(matches.data);
+            setMatchTotal(matches.data.length);
+        });
+    }, []);
+
     return (
         <div id='player_section'>
             <h2>Player Information</h2>
             <h3 id='player_name'>{getUsername()}</h3>
             <div id='player_details_container' className='centered_container'>
-                <p id='player_rating' className='player_details centered_section'><b>Rating:</b> x</p>
-                <p id='matches_played' className='player_details centered_section'><b>Matches played:</b> x</p>
+                <p id='player_rating' className='player_details centered_section'><b>Rating:</b> {rating}</p>
+                <p id='matches_played' className='player_details centered_section'><b>Matches played:</b> {matchTotal}</p>
             </div>
         </div>
     );
@@ -19,27 +43,21 @@ function PlayerSection() {
 
 function ReplaySection() {
     const [replays, setReplay] = useState([]);
-    var matchesData = {
+    const [matchesData, setMatchesData] = useState({
         player1Name: '',
         player2Name: '',
         player1Rating: 0,
         player2Rating: 0,
         winner: ''
-    }
+    });
     useEffect(() => {
-        var interval;
-        interval = setInterval(function () {
-            axios.get('http://localhost:5000/api/get-match-history', {
-                params: {
-                    username: getUsername()
-                }
-            }).then((matches) => {
-                matchesData = matches.data;
-            });
-
-            loadReplaySection();
-        }, 300);
-        return () => clearInterval(interval);
+        axios.get('http://localhost:5000/api/get-match-history', {
+            params: {
+                username: getUsername()
+            }
+        }).then((matches) => {
+            setMatchesData(matches.data);
+        });
     }, []);
 
     const loadReplaySection = () => {
@@ -54,7 +72,7 @@ function ReplaySection() {
 
     useEffect(() => {
         loadReplaySection();
-    }, []);
+    }, [matchesData]);
     
     return (
         <div id='replay_section'>
