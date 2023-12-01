@@ -1,9 +1,10 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Header, BackButton, PlayerData, getUsername } from './Components';
+import { Header, BackButton, PlayerData, getUsername, socket } from './Components';
 import { BackButtonLobby, room } from './Lobby';
 
+var getUser;
 const pieces = {
   0: 'open',
   1: 'black',
@@ -11,9 +12,20 @@ const pieces = {
 };
 
 //TODO assign each player a different color
-const playerSide = 1;
+var playerSide;
 const oppSide = playerSide === 1 ? 2 : 1;
 var oppName = '';
+
+socket.on("found_match", (res) => {
+	getUser = getUsername();
+    let allPlayers = res.allPlayers;
+    let foundObj = allPlayers.find(obj => obj.p1.player === getUser || obj.p2.player === getUser);
+    console.log(foundObj);
+    foundObj.p1.player === getUser ? oppName = foundObj.p2.player : oppName = foundObj.p1.player;
+    foundObj.p1.player === getUser ? playerSide = 1 : playerSide = 2;
+    //foundObj.p1.player === getUser ? color = foundObj.p1.color : color = foundObj.p2.color;
+    console.log(playerSide);
+});
 
 function Board({ mode }) {
   var toPlay = 1;
@@ -39,14 +51,15 @@ function Board({ mode }) {
     var interval;
     if (mode === 'AI') {
       oppName = 'AI';
+      playerSide = 1;
     }
     else {
-      //TODO get actual other name here
-      oppName = 'opponent';
+      // get opponent name - buggy
+      
     }
     axios.get('http://localhost:5000/api/create-match/', {
       params: {
-        p1Username: getUsername(),
+        p1Username: getUser,
         p2Username: oppName
       }
     }).then((res) => {
@@ -69,6 +82,7 @@ function Board({ mode }) {
   }, []);
 
   function handleClick(row, col) {
+	console.log("toPlay: " + toPlay + "playerSide: " + playerSide);
     if (toPlay === playerSide) {
       tempSquares = structuredClone(squares);
       if (checkMoveAllowed(row, col, true)) {
@@ -78,6 +92,7 @@ function Board({ mode }) {
           move: move + 1,
           toMove: toPlay === 1 ? 2 : 1
         }).then((boardRes) => {
+		  socket.emit("player_move", {name:getUser, room:room, row:row, col:col});
           toPlay = toPlay === 1 ? 2 : 1;
           if (checkGameEnd()) {
             endGame();
@@ -100,13 +115,35 @@ function Board({ mode }) {
               }, 1000);
             }
             else if (mode === 'PVP') {
-              //TODO handle multiplayer stuff
+              console.log("waiting for opponent move");
+              // TODO implement timer
             }
           }
         });
       }
     }
   }
+  
+  socket.on('opp_move', (res) => {
+	console.log("received opp_move");
+	if (toPlay !== playerSide) {  
+		setTimeout(() => {  
+		    if (checkMoveAllowed(res.row, res.col, true)){
+			    axios.post('http://localhost:5000/api/add-board-state', {
+			      match: matchID,
+			      board: tempSquares,
+			      move: currentBoardData.moveNumber + 1,
+			      toMove: toPlay === 1 ? 2 : 1
+			    }).then((boardRes) => {
+			      toPlay = toPlay === 1 ? 2 : 1;
+			      if (checkGameEnd()) {
+			        endGame();
+			      }
+			    });
+		    }
+	    }, 1000);
+    }
+  });
 
   function computerTurn() {
     let allowedSpaces = [];
@@ -292,7 +329,7 @@ function Board({ mode }) {
 function Match({ mode }) {
   return (
     <div>
-      <BackButtonLobby />
+      <BackButtonLobby from="Match"/>
       <Header value='Match' />
       <div className='match_container centered_container'>
         <div className='game_container centered_section'>

@@ -1,24 +1,32 @@
 import React from 'react';
-import { Header, getUsername } from './Components';
+import { Header, getUsername, socket } from './Components';
 import {useNavigate} from "react-router-dom";
-import { socket } from './Home';
 import axios from 'axios';
 
 export var room;
 
-/* BackButton like in Components but leaves socket room */
-export function BackButtonLobby(){
+/* BackButton like in Components but leaves socket room and opponent wins match if match is left */
+export function BackButtonLobby({from}){
 	let navigate = useNavigate();
   	
     const action = () => {
-		socket.emit("leave_room", room);
-		axios.get('http://localhost:5000/api/leave-room/' + getUsername())
+		/*axios.get('http://localhost:5000/api/leave-room/' + getUsername())
 		.then(() => {
 			navigate('/home');
       	})
       	.catch((err) => {
 			console.log(err);  
-		});
+		});*/
+		socket.emit("leave_room", {room:room, name:getUsername()});
+		navigate('/home');
+		
+		if({from} === "Match"){
+			//TODO opponent wins (change ratings)
+			socket.emit("alert_opp", room);
+			socket.on("alert", () => {
+				alert('Opponent has left. You win by default!');
+			})
+		}
     }
 
     return (
@@ -34,7 +42,16 @@ function Lobby() {
 	let inGame = false;
 	let name = getUsername();
 	
-	function matched(){
+	socket.on("found_match", (obj) => {
+		// query to find the room
+		let allPlayers = obj.allPlayers;
+		let foundObj = allPlayers.find(obj => obj.p1.player === getUsername());
+		room = foundObj.p1.room;
+		socket.emit("join_room", room);
+		navigate('/match/pvp'); // TODO: maybe add room number in path	
+	});
+	
+	/*function matched(){
 		if(inGame)
 			return;
 		else {
@@ -54,11 +71,11 @@ function Lobby() {
 		}
 	};
 	
-	setInterval(matched, 2000);
+	setInterval(matched, 2000);*/
 	
     return (
         <div>
-            <BackButtonLobby />
+            <BackButtonLobby from="lobby"/>
             <Header value='Finding a match...' />
             <br></br>
             <h2> Please wait while we find a match, or return with the Back button </h2>

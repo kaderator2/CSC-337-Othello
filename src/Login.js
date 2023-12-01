@@ -47,7 +47,7 @@ function Login() {
             const response = await axios.post('http://localhost:5000/api/login/', {
                 username: username,
                 password: password,
-            });
+            }, {withCredentials: true, credentials: 'include'});
             if (response.data.message === 'Login Successful') {
                 // set the cookie
                 cookies.set('TOKEN', response.data.token, {
