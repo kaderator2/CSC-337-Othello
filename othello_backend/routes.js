@@ -1,6 +1,6 @@
 var express = require('express');
 const { User, Match } = require("./schemas");
-const { addBoardState, boardState, matchState, createMatch, updateWinner } = require("./gameLogic");
+const { addBoardState, boardState, matchState, createMatch, updateWinner, updateRating } = require("./gameLogic");
 const auth = require("./auth");
 const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken");
@@ -161,6 +161,15 @@ router.route("/get-top-ten").get((req, res) => {
     });
 });
 
+// Get user data by username
+router.route("/get-user-data").get((req, res) => {
+    let p = User.findOne({username: req.query.name}).exec();
+    p.then((user) => {
+        console.log(user);
+        res.status(200).send(user);
+    });
+});
+
 // (this is just a starter endpoint to get the ball rolling)
 // Allows user to change their profile photo
 router.route("/change-profile-photo").post(auth, (req, res) => {
@@ -178,7 +187,7 @@ router.route("/change-profile-photo").post(auth, (req, res) => {
 let queue = [];
 let roomNumber = 1;
 router.route('/queue/:name').get((req, res) => {
-    let name = req.params.name;
+    let name = req.query.name;
     User.findOne({ username: name })
     .then((user) => {
 		queue.push(user);
@@ -244,6 +253,11 @@ router.route('/add-board-state').post((req, res) => {
 router.route('/update-winner').post((req, res) => {
     console.log("updating winner");
     updateWinner(req, res);
+});
+
+router.route("/change-user-rating").post((req, res) => {
+    console.log('updating rating');
+    updateRating(req, res);
 });
 
 module.exports = router;

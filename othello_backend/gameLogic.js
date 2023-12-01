@@ -30,9 +30,9 @@ async function createMatch(req, res) {
         const match = new Match({
             player1Name: req.query.p1Username,
             player2Name: req.query.p2Username,
-            player1Rating: 123,
-            player2Rating: 345,
-            winner: 0,
+            player1Rating: req.query.p1Rating,
+            player2Rating: req.query.p2Rating,
+            winner: 'None',
             boardStates: [startingBoard._id.toString()],
             timestamp: Date.now()
         });
@@ -104,8 +104,6 @@ async function updateWinner(req, res) {
         match.winner = req.body.winner;
         match.markModified('winner');
         await match.save();
-        console.log(req.body.matchID);
-        console.log(req.body.winner);
         console.log("winner updated");
         res.end('WINNER UPDATE SUCCESS');
     } catch (error) {
@@ -114,4 +112,21 @@ async function updateWinner(req, res) {
     }
 }
 
-module.exports = { addBoardState, boardState, matchState, createMatch, updateWinner };
+async function updateRating(req, res) {
+    try {
+        var user = await User.findOne({ username: req.body.username }).exec();
+
+        user.rating = req.body.rating;
+        user.markModified('rating');
+        await user.save();
+        console.log(req.body.username);
+        console.log(req.body.rating);
+        console.log("rating updated");
+        res.end('RATING UPDATE SUCCESS');
+    } catch (error) {
+        console.log(error);
+        res.status(500).send(error);
+    }
+}
+
+module.exports = { addBoardState, boardState, matchState, createMatch, updateWinner, updateRating };

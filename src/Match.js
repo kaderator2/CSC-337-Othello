@@ -1,5 +1,5 @@
 import React from 'react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { Header, BackButton, PlayerData, getUsername } from './Components';
 import { BackButtonLobby, room } from './Lobby';
@@ -18,6 +18,17 @@ var oppName = '';
 function Board({ mode }) {
   var toPlay = 1;
   var move = 1;
+
+  const userRef = useRef({
+    data: {
+      rating: 1000
+    }
+  });
+  const oppRef = useRef({
+    data: {
+      rating: 1000
+    }
+  });
 
   var squares = [
     [0, 0, 0, 0, 0, 0, 0, 0],
@@ -44,29 +55,66 @@ function Board({ mode }) {
       //TODO get actual other name here
       oppName = 'opponent';
     }
-    axios.get('http://localhost:5000/api/create-match/', {
+
+    //Get data for the current player
+    axios.get('http://localhost:5000/api/get-user-data', {
       params: {
-        p1Username: getUsername(),
-        p2Username: oppName
+        name: getUsername()
       }
-    }).then((res) => {
-      matchID = res.data;
-      interval = setInterval(function () {
-        axios.get('http://localhost:5000/api/match-state/' + matchID).then((matchRes) => {
-          matchData = matchRes.data;
-          let mostRecentBoardID = matchData.boardStates[matchData.boardStates.length - 1];
-          axios.get('http://localhost:5000/api/board-state/' + mostRecentBoardID).then((boardRes) => {
-            currentBoardData = boardRes.data;
-            squares = currentBoardData.boardState;
-            loadGameBoard();
-            toPlay = currentBoardData.nextPlayerTurn;
-            move = currentBoardData.moveNumber;
-          });
+    }).then((user) => {
+      userRef.current = user;
+      let p = getOppData();
+      p.then((opp) => {
+        oppRef.current = opp;
+        //Create the match
+        axios.get('http://localhost:5000/api/create-match/', {
+          params: {
+            p1Username: getUsername(),
+            p2Username: oppName,
+            p1Rating: user.data.rating,
+            p2Rating: opp.data.rating
+          }
+        }).then((res) => {
+          matchID = res.data;
+          interval = setInterval(function () {
+            axios.get('http://localhost:5000/api/match-state/' + matchID).then((matchRes) => {
+              matchData = matchRes.data;
+              let mostRecentBoardID = matchData.boardStates[matchData.boardStates.length - 1];
+              axios.get('http://localhost:5000/api/board-state/' + mostRecentBoardID).then((boardRes) => {
+                currentBoardData = boardRes.data;
+                squares = currentBoardData.boardState;
+                loadGameBoard();
+                toPlay = currentBoardData.nextPlayerTurn;
+                move = currentBoardData.moveNumber;
+              });
+            });
+          }, 500);
         });
-      }, 500);
+      });
     });
     return () => clearInterval(interval);
   }, []);
+
+  async function getOppData () {
+    if (oppName === 'AI') {
+      var opp = {
+        data: {
+          username: 'AI',
+          rating: 800
+        }
+      }
+    }
+    else {
+      axios.get('http://localhost:5000/api/get-user-data', {
+        params: {
+          name: oppName
+        }
+      }).then((user) => {
+          var opp = user;
+      });
+    }
+    return opp;
+  }
 
   function handleClick(row, col) {
     if (toPlay === playerSide) {
@@ -133,6 +181,16 @@ function Board({ mode }) {
     return true;
   }
 
+  //result should be 1 for a win, 0.5 for a draw, and 0 for a loss
+  function updateUserRating(result) {
+    var expected = 1/(1+Math.pow(10, (oppRef.current.data.rating - userRef.current.data.rating) / 400));
+    var newRating = Math.round(userRef.current.data.rating + 32 * (result - expected));
+    axios.post('http://localhost:5000/api/change-user-rating', {
+      username: getUsername(),
+      rating: newRating
+    });
+  }
+
   //Tally points and determine a winner
   function endGame() {
     let p1Score = 0;
@@ -147,14 +205,14 @@ function Board({ mode }) {
         }
       }
     }
-
     //TODO handle pop up or other menu on winning
     // TODO: disconnect from socket room
     if (p1Score === p2Score) {
       axios.post('http://localhost:5000/api/update-winner', {
-          winner: 'DRAW',
-          matchID: matchID
-        });
+        winner: 'DRAW',
+        matchID: matchID
+      });
+      updateUserRating(0.5);
       alert('DRAW');
     }
     else if (p1Score > p2Score) {
@@ -163,12 +221,14 @@ function Board({ mode }) {
           winner: getUsername(),
           matchID: matchID
         });
+        updateUserRating(1);
       }
       else {
         axios.post('http://localhost:5000/api/update-winner', {
           winner: oppName,
           matchID: matchID
         });
+        updateUserRating(0);
       }
       alert('BLACK WINS');
     }
@@ -178,12 +238,14 @@ function Board({ mode }) {
           winner: oppName,
           matchID: matchID
         });
+        updateUserRating(1);
       }
       else {
         axios.post('http://localhost:5000/api/update-winner', {
           winner: getUsername(),
           matchID: matchID
         });
+        updateUserRating(0);
       }
       alert('WHITE WINS');
     }
@@ -261,7 +323,6 @@ function Board({ mode }) {
 
   const loadGameBoard = () => {
     let arr = [];
-
     for (let i = 0; i < dimension; i++) {
       let temp = [];
       for (let j = 0; j < dimension; j++) {
@@ -280,12 +341,21 @@ function Board({ mode }) {
   }, []);
 
   return (
-    <div className='board'>
-      <section className='board_box'>
-        {game}
-      </section>
+    <div className='match_container centered_container'>
+        <div className='game_container centered_section'>
+          <PlayerData id='top_player' name={oppName} rating={oppRef.current.data.rating} />
+          <PlayerData id='bottom_player' name={getUsername()} rating={userRef.current.data.rating} />
+          <div className="game">
+            <div className='board'>
+              <section className='board_box'>
+                {game}
+              </section>
 
-    </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    
   );
 }
 
@@ -294,15 +364,7 @@ function Match({ mode }) {
     <div>
       <BackButtonLobby />
       <Header value='Match' />
-      <div className='match_container centered_container'>
-        <div className='game_container centered_section'>
-          <PlayerData id='top_player' name={oppName} rating='1400' />
-          <PlayerData id='bottom_player' name={getUsername()} rating='1450' />
-          <div className="game">
-            <Board mode={mode} />
-          </div>
-        </div>
-      </div>
+      <Board mode={mode} />
     </div>
   );
 }

@@ -65,6 +65,14 @@ function ReplayBoard({ matchData }) {
         }
     }
 
+    function compareBoardStates(a,b) {
+        if (a.moveNumber < b.moveNumber)
+           return -1;
+        if (a.moveNumber > b.moveNumber)
+          return 1;
+        return 0;
+    }
+
     async function boardStatesToArray(matchData) {
         for(let i = 0; i < matchData.boardStates.length; i++) {
             axios.get('http://localhost:5000/api/board-state/' + matchData.boardStates[i]).then((boardRes) => {
@@ -73,6 +81,7 @@ function ReplayBoard({ matchData }) {
                 }
             });
         }
+        boards.sort(compareBoardStates);
     }
 
     return (

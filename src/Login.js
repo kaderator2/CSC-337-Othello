@@ -70,6 +70,7 @@ function Login() {
             const response = await axios.post('http://localhost:5000/api/add/user', {
                 username: newUsername,
                 password: newPassword,
+                rating: 800
             });
             console.log(response.data);
         } catch (error) {
