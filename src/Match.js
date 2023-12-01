@@ -1,9 +1,10 @@
 import React from 'react';
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { Header, BackButton, PlayerData, getUsername } from './Components';
+import { Header, BackButton, PlayerData, getUsername, socket } from './Components';
 import { BackButtonLobby, room } from './Lobby';
 
+var getUser;
 const pieces = {
   0: 'open',
   1: 'black',
@@ -11,9 +12,20 @@ const pieces = {
 };
 
 //TODO assign each player a different color
-const playerSide = 1;
+var playerSide;
 const oppSide = playerSide === 1 ? 2 : 1;
 var oppName = '';
+
+socket.on("found_match", (res) => {
+	getUser = getUsername();
+    let allPlayers = res.allPlayers;
+    let foundObj = allPlayers.find(obj => obj.p1.player === getUser || obj.p2.player === getUser);
+    foundObj.p1.player === getUser ? oppName = foundObj.p2.player : oppName = foundObj.p1.player;
+    foundObj.p1.player === getUser ? playerSide = 1 : playerSide = 2;
+    //foundObj.p1.player === getUser ? color = foundObj.p1.color : color = foundObj.p2.color;
+    console.log("User: " + getUser);
+    console.log("Opp: " + oppName);
+});
 
 function Board({ mode }) {
   var toPlay = 1;
@@ -50,16 +62,13 @@ function Board({ mode }) {
     var interval;
     if (mode === 'AI') {
       oppName = 'AI';
-    }
-    else {
-      //TODO get actual other name here
-      oppName = 'opponent';
+      playerSide = 1;
     }
 
     //Get data for the current user
     axios.get('http://localhost:5000/api/get-user-data', {
       params: {
-        name: getUsername()
+		name: getUsername()
       }
     }).then((user) => {
       userRef.current = user;
@@ -96,27 +105,32 @@ function Board({ mode }) {
   }, []);
 
   async function getOppData () {
+	var opp;
     if (oppName === 'AI') {
-      var opp = {
+      opp = {
         data: {
           username: 'AI',
           rating: 800
         }
       }
+	  return opp;
     }
     else {
-      axios.get('http://localhost:5000/api/get-user-data', {
+	  return new Promise((resolve, reject) => {
+	  	axios.get('http://localhost:5000/api/get-user-data', {
         params: {
           name: oppName
         }
-      }).then((user) => {
-          var opp = user;
-      });
+	    }).then((user) => {
+	        opp = user;
+		    return resolve(opp);
+	    });
+	 });
     }
-    return opp;
   }
 
   function handleClick(row, col) {
+	console.log("toPlay: " + toPlay + " playerSide: " + playerSide);
     if (toPlay === playerSide) {
       tempSquares = structuredClone(squares);
       if (checkMoveAllowed(row, col, true)) {
@@ -126,6 +140,7 @@ function Board({ mode }) {
           move: move + 1,
           toMove: toPlay === 1 ? 2 : 1
         }).then((boardRes) => {
+		  socket.emit("player_move", {name:getUser, room:room, row:row, col:col});
           toPlay = toPlay === 1 ? 2 : 1;
           if (checkGameEnd()) {
             endGame();
@@ -148,13 +163,37 @@ function Board({ mode }) {
               }, 1000);
             }
             else if (mode === 'PVP') {
-              //TODO handle multiplayer stuff
+              console.log("waiting for opponent move");
+              // TODO implement timer
             }
           }
         });
       }
     }
   }
+  
+  socket.on('opp_move', (res) => {
+	if (toPlay !== playerSide) {  
+		setTimeout(() => {  
+			tempSquares = structuredClone(squares);
+		    if (checkMoveAllowed(res.row, res.col, true)){
+				if(currentBoardData){
+				    axios.post('http://localhost:5000/api/add-board-state', {
+				      match: matchID,
+				      board: tempSquares,
+				      move: currentBoardData.moveNumber + 1,
+				      toMove: toPlay === 1 ? 2 : 1
+				    }).then((boardRes) => {
+				      toPlay = toPlay === 1 ? 2 : 1;
+				      if (checkGameEnd()) {
+				        endGame();
+				      }
+				    });
+			    }
+		    }
+	    }, 1000);
+    }
+  });
 
   function computerTurn() {
     let allowedSpaces = [];
@@ -206,7 +245,7 @@ function Board({ mode }) {
       }
     }
     //TODO handle pop up or other menu on winning
-    // TODO: disconnect from socket room
+    // TODO: user wins on opponent disconnect
     if (p1Score === p2Score) {
       axios.post('http://localhost:5000/api/update-winner', {
         winner: 'DRAW',
@@ -362,7 +401,7 @@ function Board({ mode }) {
 function Match({ mode }) {
   return (
     <div>
-      <BackButtonLobby />
+      <BackButtonLobby from="Match"/>
       <Header value='Match' />
       <Board mode={mode} />
     </div>

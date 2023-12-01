@@ -1,11 +1,9 @@
 import { useNavigate } from "react-router-dom";
-import { ProfilePicture, Header, getUsername } from './Components';
+import { ProfilePicture, Header, getUsername, socket } from './Components';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import io from "socket.io-client";
 import Cookies from 'universal-cookie';
 
-export const socket = io.connect("http://localhost:3001");
 
 function HelpButton() {
 	let navigate = useNavigate();
@@ -69,13 +67,15 @@ function PlayButton({ opponent }) {
 		}
 		else {
 			let name = getUsername();
-	        axios.get('http://localhost:5000/api/queue/' + name)
+			socket.emit("queue", {name:name});
+			navigate('/lobby');
+	        /*axios.get('http://localhost:5000/api/queue/' + name)
 	        .then(() => {
 				navigate('/lobby');
 	        })
 	        .catch((err) => {
 					console.log(err);
-			});		
+			});*/		
 		}
 	}
 	return (

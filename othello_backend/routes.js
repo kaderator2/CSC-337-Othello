@@ -5,6 +5,7 @@ const auth = require("./auth");
 const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken");
 
+
 var router = express.Router();
 
 // Receives the request to add a user to the database
@@ -167,7 +168,8 @@ router.route("/get-user-data").get((req, res) => {
     p.then((user) => {
         console.log(user);
         res.status(200).send(user);
-    });
+    })
+    .catch((err) => {console.log(err);});
 });
 
 // (this is just a starter endpoint to get the ball rolling)
