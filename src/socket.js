@@ -37,9 +37,8 @@ io.on("connection", (socket) => {
     	socket.leave(data.room);
   	});
   	
-  	socket.on("alert_opp", (room) => {
-		console.log('alerting');
-    	io.to(room).emit('alert', room);
+  	socket.on("alert_opp", (data) => {
+    	io.to(data.room).emit('alert', data);
   	});
   	
   	socket.on("queue", (user) => {
@@ -80,7 +79,6 @@ io.on("connection", (socket) => {
     	//TODO send move only to other player
     	//let moved = data.name;
     	//let sendTo = moved === allRooms.room[0] ? allRooms.room[1] : allRooms.room[1];
-    	console.log("received player_move");
     	let room = data.room;
     	io.to(room).emit('opp_move', {row : data.row, col : data.col});
   	});

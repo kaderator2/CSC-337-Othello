@@ -1,17 +1,21 @@
 import React from 'react';
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { Header, BackButton, PlayerData, getUsername, socket } from './Components';
-import { BackButtonLobby, room } from './Lobby';
+import { Header, PlayerData, getUsername, socket } from './Components';
+import { room } from './Lobby';
+import {useNavigate} from "react-router-dom";
 
+var gameOver = false;
 var getUser;
+var matchID;
+var userRef;
+var oppRef;
 const pieces = {
   0: 'open',
   1: 'black',
   2: 'white'
 };
 
-//TODO assign each player a different color
 var playerSide;
 const oppSide = playerSide === 1 ? 2 : 1;
 var oppName = '';
@@ -22,21 +26,18 @@ socket.on("found_match", (res) => {
     let foundObj = allPlayers.find(obj => obj.p1.player === getUser || obj.p2.player === getUser);
     foundObj.p1.player === getUser ? oppName = foundObj.p2.player : oppName = foundObj.p1.player;
     foundObj.p1.player === getUser ? playerSide = 1 : playerSide = 2;
-    //foundObj.p1.player === getUser ? color = foundObj.p1.color : color = foundObj.p2.color;
-    console.log("User: " + getUser);
-    console.log("Opp: " + oppName);
 });
 
 function Board({ mode }) {
   var toPlay = 1;
   var move = 1;
 
-  const userRef = useRef({
+  userRef = useRef({
     data: {
       rating: '?'
     }
   });
-  const oppRef = useRef({
+  oppRef = useRef({
     data: {
       rating: '?'
     }
@@ -54,7 +55,7 @@ function Board({ mode }) {
   ];
   var tempSquares;
 
-  var matchID;
+  //var matchID;
   var matchData;
   var currentBoardData;
 
@@ -217,6 +218,7 @@ function Board({ mode }) {
         }
       }
     }
+    gameOver = true;
     return true;
   }
 
@@ -228,6 +230,25 @@ function Board({ mode }) {
       username: getUsername(),
       rating: newRating
     });
+  }
+  
+  function endEarly(winner){
+      if(winner === getUsername()) {
+        axios.post('http://localhost:5000/api/update-winner', {
+          winner: getUsername(),
+          matchID: matchID
+        });
+        updateUserRating(1);
+        alert('Opponent has left. You win by default!');
+      }
+      else if(winner === oppName) {
+        axios.post('http://localhost:5000/api/update-winner', {
+          winner: oppName,
+          matchID: matchID
+        });
+        updateUserRating(0);
+      }
+      gameOver = true;
   }
 
   //Tally points and determine a winner
@@ -245,7 +266,6 @@ function Board({ mode }) {
       }
     }
     //TODO handle pop up or other menu on winning
-    // TODO: user wins on opponent disconnect
     if (p1Score === p2Score) {
       axios.post('http://localhost:5000/api/update-winner', {
         winner: 'DRAW',
@@ -374,9 +394,27 @@ function Board({ mode }) {
 
     setGame(arr);
   }
-
+  
   useEffect(() => {
     loadGameBoard();
+  }, []);
+  
+  // receive an alert if a user abandons match, remaining player wins
+  useEffect(() => {
+	  gameOver = false;
+	  socket.on("alert", (data) => {
+		  console.log("alert received");
+		  if (gameOver)
+		  	return;
+		  let playerEnded = data.user;
+		  let winner;
+		  playerEnded === getUsername() ? winner = oppName : winner = getUsername();
+		  endEarly(winner);
+	  });
+	
+	  return () => {
+	    socket.off('alert');
+	  };
   }, []);
 
   return (
@@ -398,10 +436,41 @@ function Board({ mode }) {
   );
 }
 
+function BackButtonMatch(){
+	function updateUserRating(result) {
+	    var expected = 1/(1+Math.pow(10, (oppRef.current.data.rating - userRef.current.data.rating) / 400));
+	    var newRating = Math.round(userRef.current.data.rating + 32 * (result - expected));
+	    axios.post('http://localhost:5000/api/change-user-rating', {
+	      username: getUsername(),
+	      rating: newRating
+	    });
+	  }
+	
+	let navigate = useNavigate();	
+    const leave = () => {
+		socket.emit("leave_room", {room:room, name:getUsername()});
+		navigate('/home');
+
+		if(!gameOver){  
+			socket.emit("alert_opp", {room:room, user:getUsername()});	// update for remaining player
+			axios.post('http://localhost:5000/api/update-winner', {		// update for abandoning player
+	          winner: oppName,
+	          matchID: matchID
+	        });
+	        updateUserRating(0);
+		}
+    }
+    return (
+        <div className='back_button_wrapper'>
+            <button onClick={leave} className='back_button green_button fixed'>Back</button>
+        </div>
+    );
+}
+
 function Match({ mode }) {
   return (
     <div>
-      <BackButtonLobby from="Match"/>
+      <BackButtonMatch />
       <Header value='Match' />
       <Board mode={mode} />
     </div>
