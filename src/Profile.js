@@ -78,7 +78,6 @@ function ReplaySection() {
         <div id='replay_section'>
             <h2>Replays</h2>
             <div id='replays'>
-                {/* TODO temp replays here for testing. Actual replays should be loaded from DB on load */}
                 {replays}
             </div>
         </div>
@@ -88,8 +87,7 @@ function ReplaySection() {
 function Replay ({matchData}) {
     let navigate = useNavigate();
     const goToReplay = () => {
-        navigate('/replay', {state:{matchData: matchData}});
-        //TODO implement sending data about specific replay
+        navigate('/replay', {replace: true, state: {matchData: matchData} });
     }
 
     return (

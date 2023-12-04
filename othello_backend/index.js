@@ -1,3 +1,9 @@
+/*
+ * CSC 337 - Final Project - Elijah Parent, Kade Dean, Andres Silva-Castellanos
+ * This file initializes the database connection, sets up CORS, and sets up sessions, along with a
+ * few other tasks.
+ */
+
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');

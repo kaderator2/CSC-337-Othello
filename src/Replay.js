@@ -35,6 +35,8 @@ function ReplayBoard({ matchData }) {
         for (let i = 0; i < dimension; i++) {
         let temp = [];
         for (let j = 0; j < dimension; j++) {
+            console.log(move);
+            console.log(boards);
             temp.push(<div id={i.toString() + j.toString()} className='board_square'>
             <div className={'piece ' + pieces[boards[move][i][j]]}></div>
             </div>);
@@ -74,14 +76,26 @@ function ReplayBoard({ matchData }) {
     }
 
     async function boardStatesToArray(matchData) {
+        let tempBoards = [[
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 2, 1, 0, 0, 0],
+            [0, 0, 0, 1, 2, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0]
+        ]];
+
         for(let i = 0; i < matchData.boardStates.length; i++) {
             axios.get('http://localhost:5000/api/board-state/' + matchData.boardStates[i]).then((boardRes) => {
                 if (i > 0) {
                     boards.push(boardRes.data.boardState);
+                    boards.sort(compareBoardStates);
                 }
             });
         }
-        boards.sort(compareBoardStates);
+        boards = tempBoards;
     }
 
     return (

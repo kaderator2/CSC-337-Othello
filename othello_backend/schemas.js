@@ -1,5 +1,6 @@
-/**
- * Specifies the required schemas for the database, items and users.
+/*
+ * CSC 337 - Final Project - Elijah Parent, Kade Dean, Andres Silva-Castellanos
+ * This file specifies the required schemas for the database, items and users.
  */
 
 const mongoose = require('mongoose');
