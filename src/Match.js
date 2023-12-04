@@ -9,7 +9,7 @@ import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { Header, PlayerData, getUsername, socket } from './Components';
 import { room } from './Lobby';
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 var gameOver = false;
 var getUser;
@@ -27,11 +27,11 @@ const oppSide = playerSide === 1 ? 2 : 1;
 var oppName = '';
 
 socket.on("found_match", (res) => {
-	getUser = getUsername();
-    let allPlayers = res.allPlayers;
-    let foundObj = allPlayers.find(obj => obj.p1.player === getUser || obj.p2.player === getUser);
-    foundObj.p1.player === getUser ? oppName = foundObj.p2.player : oppName = foundObj.p1.player;
-    foundObj.p1.player === getUser ? playerSide = 1 : playerSide = 2;
+  getUser = getUsername();
+  let allPlayers = res.allPlayers;
+  let foundObj = allPlayers.find(obj => obj.p1.player === getUser || obj.p2.player === getUser);
+  foundObj.p1.player === getUser ? oppName = foundObj.p2.player : oppName = foundObj.p1.player;
+  foundObj.p1.player === getUser ? playerSide = 1 : playerSide = 2;
 });
 
 /*
@@ -68,7 +68,7 @@ function Board({ mode }) {
     [0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0]
   ];
-  
+
   var tempSquares;
   var matchData;
   var currentBoardData;
@@ -83,7 +83,7 @@ function Board({ mode }) {
     //Get data for the current user
     axios.get('http://localhost:5000/api/get-user-data', {
       params: {
-		name: getUsername()
+        name: getUsername()
       }
     }).then((user) => {
       userRef.current = user;
@@ -99,12 +99,14 @@ function Board({ mode }) {
             p2Rating: opp.data.rating
           }
         }).then((res) => {
+          //Create the first board state
           matchID = res.data;
           interval = setInterval(function () {
             axios.get('http://localhost:5000/api/match-state/' + matchID).then((matchRes) => {
               matchData = matchRes.data;
               let mostRecentBoardID = matchData.boardStates[matchData.boardStates.length - 1];
               axios.get('http://localhost:5000/api/board-state/' + mostRecentBoardID).then((boardRes) => {
+                //Update the board
                 currentBoardData = boardRes.data;
                 squares = currentBoardData.boardState;
                 loadGameBoard();
@@ -119,34 +121,46 @@ function Board({ mode }) {
     return () => clearInterval(interval);
   }, []);
 
-  async function getOppData () {
-	var opp;
+  /*
+  This function is used to load the opponent's data.
+  */
+  async function getOppData() {
+    var opp;
     if (oppName === 'AI') {
+      // if AI, set rating to 800
       opp = {
         data: {
           username: 'AI',
           rating: 800
         }
       }
-	  return opp;
+      return opp;
     }
     else {
-	  return new Promise((resolve, reject) => {
-	  	axios.get('http://localhost:5000/api/get-user-data', {
-        params: {
-          name: oppName
-        }
-	    }).then((user) => {
-	        opp = user;
-		    return resolve(opp);
-	    });
-	 });
+      return new Promise((resolve, reject) => {
+        //Get data for the opponent if not AI
+        axios.get('http://localhost:5000/api/get-user-data', {
+          params: {
+            name: oppName
+          }
+        }).then((user) => {
+          opp = user;
+          return resolve(opp);
+        });
+      });
     }
   }
 
+  /*
+  This function is used to load the game board.
+
+  row - the row of the square to be clicked
+  col - the column of the square to be clicked
+  */
   function handleClick(row, col) {
-	console.log("toPlay: " + toPlay + " playerSide: " + playerSide);
+    console.log("toPlay: " + toPlay + " playerSide: " + playerSide);
     if (toPlay === playerSide) {
+      //Check if the move is allowed
       tempSquares = structuredClone(squares);
       if (checkMoveAllowed(row, col, true)) {
         axios.post('http://localhost:5000/api/add-board-state', {
@@ -155,13 +169,15 @@ function Board({ mode }) {
           move: move + 1,
           toMove: toPlay === 1 ? 2 : 1
         }).then((boardRes) => {
-		  socket.emit("player_move", {name:getUser, room:room, row:row, col:col});
+          //Update the board
+          socket.emit("player_move", { name: getUser, room: room, row: row, col: col });
           toPlay = toPlay === 1 ? 2 : 1;
           if (checkGameEnd()) {
             endGame();
           }
           else {
             if (mode === 'AI') {
+              //Wait for the AI to make a move
               setTimeout(() => {
                 computerTurn();
                 axios.post('http://localhost:5000/api/add-board-state', {
@@ -186,30 +202,34 @@ function Board({ mode }) {
       }
     }
   }
-  
+
+  // uses structured cloning to copy the board state upon each opponent move
   socket.on('opp_move', (res) => {
-	if (toPlay !== playerSide) {  
-		setTimeout(() => {  
-			tempSquares = structuredClone(squares);
-		    if (checkMoveAllowed(res.row, res.col, true)){
-				if(currentBoardData){
-				    axios.post('http://localhost:5000/api/add-board-state', {
-				      match: matchID,
-				      board: tempSquares,
-				      move: currentBoardData.moveNumber + 1,
-				      toMove: toPlay === 1 ? 2 : 1
-				    }).then((boardRes) => {
-				      toPlay = toPlay === 1 ? 2 : 1;
-				      if (checkGameEnd()) {
-				        endGame();
-				      }
-				    });
-			    }
-		    }
-	    }, 1000);
+    if (toPlay !== playerSide) {
+      setTimeout(() => {
+        tempSquares = structuredClone(squares);
+        if (checkMoveAllowed(res.row, res.col, true)) {
+          if (currentBoardData) {
+            axios.post('http://localhost:5000/api/add-board-state', {
+              match: matchID,
+              board: tempSquares,
+              move: currentBoardData.moveNumber + 1,
+              toMove: toPlay === 1 ? 2 : 1
+            }).then((boardRes) => {
+              toPlay = toPlay === 1 ? 2 : 1;
+              if (checkGameEnd()) {
+                endGame();
+              }
+            });
+          }
+        }
+      }, 1000);
     }
   });
 
+  /*
+  This function handles the AI's turn.
+  */
   function computerTurn() {
     let allowedSpaces = [];
     for (let i = 0; i < dimension; i++) {
@@ -238,31 +258,34 @@ function Board({ mode }) {
 
   //result should be 1 for a win, 0.5 for a draw, and 0 for a loss
   function updateUserRating(result) {
-    var expected = 1/(1+Math.pow(10, (oppRef.current.data.rating - userRef.current.data.rating) / 400));
+    var expected = 1 / (1 + Math.pow(10, (oppRef.current.data.rating - userRef.current.data.rating) / 400));
     var newRating = Math.round(userRef.current.data.rating + 32 * (result - expected));
     axios.post('http://localhost:5000/api/change-user-rating', {
       username: getUsername(),
       rating: newRating
     });
   }
-  
-  function endEarly(winner){
-      if(winner === getUsername()) {
-        axios.post('http://localhost:5000/api/update-winner', {
-          winner: getUsername(),
-          matchID: matchID
-        });
-        updateUserRating(1);
-        alert('Opponent has left. You win by default!');
-      }
-      else if(winner === oppName) {
-        axios.post('http://localhost:5000/api/update-winner', {
-          winner: oppName,
-          matchID: matchID
-        });
-        updateUserRating(0);
-      }
-      gameOver = true;
+
+  // handle opponent leaving early
+  function endEarly(winner) {
+    if (winner === getUsername()) {
+      // update for remaining player
+      axios.post('http://localhost:5000/api/update-winner', {
+        winner: getUsername(),
+        matchID: matchID
+      });
+      updateUserRating(1);
+      alert('Opponent has left. You win by default!');
+    }
+    else if (winner === oppName) {
+      // update for remaining opponent
+      axios.post('http://localhost:5000/api/update-winner', {
+        winner: oppName,
+        matchID: matchID
+      });
+      updateUserRating(0);
+    }
+    gameOver = true;
   }
 
   //Tally points and determine a winner
@@ -281,6 +304,7 @@ function Board({ mode }) {
     }
     //TODO handle pop up or other menu on winning
     if (p1Score === p2Score) {
+      // handle draw
       axios.post('http://localhost:5000/api/update-winner', {
         winner: 'DRAW',
         matchID: matchID
@@ -289,7 +313,8 @@ function Board({ mode }) {
       alert('DRAW');
     }
     else if (p1Score > p2Score) {
-      if(playerSide === 1) {
+      // if the winner is player 1, update the winner in the database and update the user's rating
+      if (playerSide === 1) {
         axios.post('http://localhost:5000/api/update-winner', {
           winner: getUsername(),
           matchID: matchID
@@ -306,7 +331,8 @@ function Board({ mode }) {
       alert('BLACK WINS');
     }
     else {
-      if(playerSide === 2) {
+      // the winner is player 2, update the winner in the database and update the user's rating
+      if (playerSide === 2) {
         axios.post('http://localhost:5000/api/update-winner', {
           winner: oppName,
           matchID: matchID
@@ -355,7 +381,15 @@ function Board({ mode }) {
     return allowed;
   }
 
-  //check if line is opposing pieces sandwiched between own pieces
+  /*
+  This function checks if a move is allowed in a given direction.
+
+  row - the row to be used as the starting point
+  col - the column to be used as the starting point
+  dirHorizontal - the horizontal direction to check
+  dirVertical - the vertical direction to check
+  attemptMove - a boolean, true if the move should be attempted, false if not
+  */
   function checkMoveOnLine(row, col, dirHorizontal, dirVertical, attemptMove) {
     let i = 0;
     let foundOpp = false;
@@ -380,6 +414,14 @@ function Board({ mode }) {
     return false;
   }
 
+  /*
+  This function captures pieces in a given direction.
+
+  row - the row to be used as the starting point
+  col - the column to be used as the starting point
+  dirHorizontal - the horizontal direction to check
+  dirVertical - the vertical direction to check
+  */
   function captureDownLine(row, col, dirHorizontal, dirVertical) {
     let i = 0;
     while (0 <= (row + (i * dirHorizontal)) && (row + (i * dirHorizontal)) < dimension && 0 <= (col + (i * dirVertical)) && (col + (i * dirVertical)) < dimension) {
@@ -394,6 +436,7 @@ function Board({ mode }) {
   const [game, setGame] = useState([]);
   const dimension = 8;
 
+  // loads the board
   const loadGameBoard = () => {
     let arr = [];
     for (let i = 0; i < dimension; i++) {
@@ -408,77 +451,81 @@ function Board({ mode }) {
 
     setGame(arr);
   }
-  
+
   useEffect(() => {
     loadGameBoard();
   }, []);
-  
+
   // receive an alert if a user abandons match, remaining player wins
   useEffect(() => {
-	  gameOver = false;
-	  socket.on("alert", (data) => {
-		  console.log("alert received");
-		  if (gameOver)
-		  	return;
-		  let playerEnded = data.user;
-		  let winner;
-		  playerEnded === getUsername() ? winner = oppName : winner = getUsername();
-		  endEarly(winner);
-	  });
-	
-	  return () => {
-	    socket.off('alert');
-	  };
+    gameOver = false;
+    socket.on("alert", (data) => {
+      console.log("alert received");
+      if (gameOver)
+        return;
+      let playerEnded = data.user;
+      let winner;
+      playerEnded === getUsername() ? winner = oppName : winner = getUsername();
+      endEarly(winner);
+    });
+
+    return () => {
+      socket.off('alert');
+    };
   }, []);
 
   return (
     <div className='match_container centered_container'>
-        <div className='game_container centered_section'>
-          <PlayerData id='top_player' name={oppName} rating={oppRef.current.data.rating} />
-          <PlayerData id='bottom_player' name={getUsername()} rating={userRef.current.data.rating} />
-          <div className="game">
-            <div className='board'>
-              <section className='board_box'>
-                {game}
-              </section>
+      <div className='game_container centered_section'>
+        <PlayerData id='top_player' name={oppName} rating={oppRef.current.data.rating} />
+        <PlayerData id='bottom_player' name={getUsername()} rating={userRef.current.data.rating} />
+        <div className="game">
+          <div className='board'>
+            <section className='board_box'>
+              {game}
+            </section>
 
-            </div>
           </div>
         </div>
       </div>
-    
+    </div>
+
   );
 }
 
-function BackButtonMatch(){
-	function updateUserRating(result) {
-	    var expected = 1/(1+Math.pow(10, (oppRef.current.data.rating - userRef.current.data.rating) / 400));
-	    var newRating = Math.round(userRef.current.data.rating + 32 * (result - expected));
-	    axios.post('http://localhost:5000/api/change-user-rating', {
-	      username: getUsername(),
-	      rating: newRating
-	    });
-	  }
-	
-	let navigate = useNavigate();	
-    const leave = () => {
-		socket.emit("leave_room", {room:room, name:getUsername()});
-		navigate('/home');
+/*
+This function handles the back button on the match page.
+*/
+function BackButtonMatch() {
+  function updateUserRating(result) {
+    var expected = 1 / (1 + Math.pow(10, (oppRef.current.data.rating - userRef.current.data.rating) / 400));
+    var newRating = Math.round(userRef.current.data.rating + 32 * (result - expected));
+    axios.post('http://localhost:5000/api/change-user-rating', {
+      username: getUsername(),
+      rating: newRating
+    });
+  }
 
-		if(!gameOver){  
-			socket.emit("alert_opp", {room:room, user:getUsername()});	// update for remaining player
-			axios.post('http://localhost:5000/api/update-winner', {		// update for abandoning player
-	          winner: oppName,
-	          matchID: matchID
-	        });
-	        updateUserRating(0);
-		}
+  let navigate = useNavigate();
+  const leave = () => {
+    socket.emit("leave_room", { room: room, name: getUsername() });
+    navigate('/home');
+
+    if (!gameOver) {
+      // if the game is not over, update the winner in the database and update the user's rating
+      socket.emit("alert_opp", { room: room, user: getUsername() });	// update for remaining player
+      axios.post('http://localhost:5000/api/update-winner', {		// update for abandoning player
+        winner: oppName,
+        matchID: matchID
+      });
+      updateUserRating(0);
     }
-    return (
-        <div className='back_button_wrapper'>
-            <button onClick={leave} className='back_button green_button fixed'>Back</button>
-        </div>
-    );
+  }
+  return (
+    <div className='back_button_wrapper'>
+      <button onClick={leave} className='back_button green_button fixed'>Back</button>
+    </div>
+  );
 }
 
 function Match({ mode }) {
