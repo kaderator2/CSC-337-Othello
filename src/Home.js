@@ -1,3 +1,9 @@
+/*
+ * CSC 337 - Final Project - Elijah Parent, Kade Dean, Andres Silva-Castellanos
+ * This file manages the main menu of the site, which contains buttons to access the help menu,
+ * play matches, view profile, and log out.
+ */
+
 import { useNavigate } from "react-router-dom";
 import { ProfilePicture, Header, getUsername, socket } from './Components';
 import React, { useState, useEffect } from 'react';

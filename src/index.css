@@ -1,3 +1,8 @@
+/*
+ * CSC 337 - Final Project - Elijah Parent, Kade Dean, Andres Silva-Castellanos
+ * This file contains all of the CSS formatting for the sit, sorted by purpose and component.
+ */
+
 /* General */
 body {
   margin: 0px;
@@ -25,9 +30,7 @@ code {
   padding-bottom: 2vh;
 }
 
-h1,
-h2,
-h3 {
+h1, h2, h3 {
   color: #8df0c2;
   ;
 }
