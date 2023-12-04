@@ -1,5 +1,18 @@
+/*
+ * CSC 337 - Final Project - Elijah Parent, Kade Dean, Andres Silva-Castellanos
+ * This file contains the authentication middleware for the backend.
+ */
+
 const jwt = require("jsonwebtoken");
 
+/*
+This middleware is used to authenticate the user before they can access the endpoints. 
+It checks if the token is valid and then passes down the user details to the endpoints.
+
+request: The request object
+response: The response object
+next: The next function to call
+*/
 module.exports = async (request, response, next) => {
     try {
         // get the token from the authorization header

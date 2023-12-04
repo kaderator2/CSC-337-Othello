@@ -1,3 +1,8 @@
+/*
+ * CSC 337 - Final Project - Elijah Parent, Kade Dean, Andres Silva-Castellanos
+ * This file contains the login page for the frontend.
+ */
+
 import React, { useState } from 'react';
 import Default, { Header } from './Components';
 import axios from 'axios';
@@ -5,6 +10,14 @@ import { useNavigate } from 'react-router-dom';
 import Cookies from 'universal-cookie';
 const cookies = new Cookies();
 
+/*
+This component is used to render the input fields for the login page.
+
+id: The id of the input field
+value: The label for the input field
+type: The type of the input field
+onChange: The function to call when the input field changes
+*/
 function InputPair({ id, value, type, onChange }) {
     return (
         <div className='input_pair'>
@@ -23,6 +36,13 @@ function InputPair({ id, value, type, onChange }) {
     );
 }
 
+/*
+This component is used to render the login button.
+
+id: The id of the button
+onButtonClick: The function to call when the button is clicked
+value: The text to display on the button
+*/
 function LoginButton({ id, onButtonClick, value }) {
     return (
         <div className='center_login_buttons'>
@@ -33,21 +53,24 @@ function LoginButton({ id, onButtonClick, value }) {
     );
 }
 
+/*
+This component is used to render the login page.
+*/
 function Login() {
+    // state variables for the login page
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [newUsername, setNewUsername] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [errorMessages, setErrorMessages] = useState('');
 
-    const navigate = useNavigate();
-
+    // function to attempt to login
     const attemptLogin = async () => {
         try {
             const response = await axios.post('http://localhost:5000/api/login/', {
                 username: username,
                 password: password,
-            }, {withCredentials: true, credentials: 'include'});
+            }, { withCredentials: true, credentials: 'include' });
             if (response.data.message === 'Login Successful') {
                 // set the cookie
                 cookies.set('TOKEN', response.data.token, {
@@ -60,11 +83,13 @@ function Login() {
                 window.location.href = '/home';
             }
         } catch (error) {
+            // if there is an error, display it
             console.error(error);
             setErrorMessages(error.response.data.message);
         }
     };
 
+    // function to create an account
     const createAccount = async () => {
         try {
             const response = await axios.post('http://localhost:5000/api/add/user', {

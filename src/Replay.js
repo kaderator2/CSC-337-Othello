@@ -1,15 +1,22 @@
+/*
+ * CSC 337 - Final Project - Elijah Parent, Kade Dean, Andres Silva-Castellanos
+ * This file contains the replay page for the frontend. This page is used to
+ * replay a match that has already been played.
+ */
+
 import React from 'react';
 import { useState, useEffect } from 'react';
-import Default, {Header, BackButton, PlayerData} from './Components'
-import {useLocation} from 'react-router-dom';
+import Default, { Header, BackButton, PlayerData } from './Components'
+import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 
 const pieces = {
     0: 'open',
     1: 'black',
     2: 'white'
-  };
+};
 
+// default board
 var boards = [[
     [0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0],
@@ -22,6 +29,11 @@ var boards = [[
 ]];
 
 var move = 0;
+
+/*
+This component is used to render the replay board.
+matchData: The data for the match to replay
+*/
 function ReplayBoard({ matchData }) {
     useEffect(() => {
         move = 0;
@@ -30,20 +42,22 @@ function ReplayBoard({ matchData }) {
     const [board, setBoard] = useState([]);
     const dimension = 8;
 
+    // loads the board
     const loadGameBoard = () => {
         let arr = [];
         for (let i = 0; i < dimension; i++) {
-        let temp = [];
-        for (let j = 0; j < dimension; j++) {
-            console.log(move);
-            console.log(boards);
-            temp.push(<div id={i.toString() + j.toString()} className='board_square'>
-            <div className={'piece ' + pieces[boards[move][i][j]]}></div>
-            </div>);
+            let temp = [];
+            for (let j = 0; j < dimension; j++) {
+                console.log(move);
+                console.log(boards);
+                temp.push(<div id={i.toString() + j.toString()} className='board_square'>
+                    <div className={'piece ' + pieces[boards[move][i][j]]}></div>
+                </div>);
+            }
+            // add the row to the board
+            arr.push(temp);
         }
-        arr.push(temp);
-        }
-
+        // set the board
         setBoard(arr);
     }
 
@@ -53,6 +67,7 @@ function ReplayBoard({ matchData }) {
         });
     }, []);
 
+    // moves the board forward one move
     const moveForward = () => {
         if (move < boards.length - 1) {
             move++;
@@ -60,6 +75,7 @@ function ReplayBoard({ matchData }) {
         }
     }
 
+    // moves the board back one move
     const moveBack = () => {
         if (move > 0) {
             move--;
@@ -67,14 +83,25 @@ function ReplayBoard({ matchData }) {
         }
     }
 
-    function compareBoardStates(a,b) {
+    /*
+    This function is used to compare two board states.
+
+    a: The first board state
+    b: The second board state
+    */
+    function compareBoardStates(a, b) {
         if (a.moveNumber < b.moveNumber)
-           return -1;
+            return -1;
         if (a.moveNumber > b.moveNumber)
-          return 1;
+            return 1;
         return 0;
     }
 
+    /*
+    This function is used to convert the board states to an array.
+
+    matchData: The data for the match to replay
+    */
     async function boardStatesToArray(matchData) {
         let tempBoards = [[
             [0, 0, 0, 0, 0, 0, 0, 0],
@@ -87,9 +114,11 @@ function ReplayBoard({ matchData }) {
             [0, 0, 0, 0, 0, 0, 0, 0]
         ]];
 
-        for(let i = 0; i < matchData.boardStates.length; i++) {
+        // get the board states
+        for (let i = 0; i < matchData.boardStates.length; i++) {
             axios.get('http://localhost:5000/api/board-state/' + matchData.boardStates[i]).then((boardRes) => {
                 if (i > 0) {
+                    // add the board state to the array
                     boards.push(boardRes.data.boardState);
                     boards.sort(compareBoardStates);
                 }
@@ -121,6 +150,9 @@ function ReplayBoard({ matchData }) {
     );
 }
 
+/*
+This component is used to render the replay page.
+*/
 function Replay() {
     const location = useLocation();
 

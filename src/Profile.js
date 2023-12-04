@@ -1,10 +1,17 @@
+/*
+ * CSC 337 - Final Project - Elijah Parent, Kade Dean, Andres Silva-Castellanos
+ * This file contains the profile page for the frontend.
+ */
+
 import React from 'react';
 import { useState, useEffect, useRef } from 'react';
 import Default, { Header, BackButton, getUsername } from './Components'
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 
+// This component is used to render the player section of the profile page
 function PlayerSection() {
+    // state variables for the player section
     const [rating, setRating] = useState('?');
     const [matchTotal, setMatchTotal] = useState('?');
 
@@ -12,7 +19,7 @@ function PlayerSection() {
         //Get data for the current user
         axios.get('http://localhost:5000/api/get-user-data', {
             params: {
-            name: getUsername()
+                name: getUsername()
             }
         }).then((user) => {
             console.log(user.data);
@@ -41,7 +48,11 @@ function PlayerSection() {
     );
 }
 
+/*
+This component is used to render the replay section of the profile page.
+*/
 function ReplaySection() {
+    // state variables for the replay section
     const [replays, setReplay] = useState([]);
     const [matchesData, setMatchesData] = useState({
         player1Name: '',
@@ -60,20 +71,22 @@ function ReplaySection() {
         });
     }, []);
 
+    // function to load the replay section
     const loadReplaySection = () => {
         let arr = [];
 
         for (let i = matchesData.length - 1, count = 0; i >= 0 && count < 10; i--, count++) {
-            arr.push(<Replay id={i} matchData={matchesData[i]}/>);
+            arr.push(<Replay id={i} matchData={matchesData[i]} />);
         }
 
         setReplay(arr);
     }
 
     useEffect(() => {
+        // load the replay section
         loadReplaySection();
     }, [matchesData]);
-    
+
     return (
         <div id='replay_section'>
             <h2>Replays</h2>
@@ -84,10 +97,14 @@ function ReplaySection() {
     );
 }
 
-function Replay ({matchData}) {
+/*
+This component is used to render a replay.
+*/
+function Replay({ matchData }) {
     let navigate = useNavigate();
+    // function to navigate to the replay page
     const goToReplay = () => {
-        navigate('/replay', {replace: true, state: {matchData: matchData} });
+        navigate('/replay', { replace: true, state: { matchData: matchData } });
     }
 
     return (
@@ -100,6 +117,10 @@ function Replay ({matchData}) {
         </div>
     );
 }
+
+/*
+This component is used to render the profile page.
+*/
 function Profile() {
     return (
         <div>
