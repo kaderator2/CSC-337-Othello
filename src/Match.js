@@ -1,3 +1,9 @@
+/*
+ * CSC 337 - Final Project - Elijah Parent, Kade Dean, Andres Silva-Castellanos
+ * This file manages the match page of the site, managing gameplay and sending and recieving
+ * necessary data from the server.
+ */
+
 import React from 'react';
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
@@ -28,21 +34,30 @@ socket.on("found_match", (res) => {
     foundObj.p1.player === getUser ? playerSide = 1 : playerSide = 2;
 });
 
+/*
+This React component creates the game board and page, containing sub-functions to update values.
+
+mode - a string, either 'AI' or 'PVP', denoting the match type
+*/
 function Board({ mode }) {
   var toPlay = 1;
   var move = 1;
 
+  // Temp value
   userRef = useRef({
     data: {
       rating: '?'
     }
   });
+
+  // Temp value
   oppRef = useRef({
     data: {
       rating: '?'
     }
   });
 
+  // Temp value
   var squares = [
     [0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0],
@@ -53,9 +68,8 @@ function Board({ mode }) {
     [0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0]
   ];
+  
   var tempSquares;
-
-  //var matchID;
   var matchData;
   var currentBoardData;
 
