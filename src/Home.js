@@ -4,7 +4,9 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Cookies from 'universal-cookie';
 
-
+/*
+This React component creates a help button, which routes to the help page.
+*/
 function HelpButton() {
 	let navigate = useNavigate();
 	const goToHelp = () => {
@@ -16,6 +18,10 @@ function HelpButton() {
 	);
 }
 
+/*
+This React component creates a log out button, which sends a request to log out the current user. Then, it
+clears the cookie and sends the user back to the login page.
+*/
 function LogoutButton() {
 	let navigate = useNavigate();
 	const cookies = new Cookies();
@@ -38,6 +44,9 @@ function LogoutButton() {
 	);
 }
 
+/*
+This React component creates a profile button, which routes to the profile page.
+*/
 function ProfileButton() {
 	let navigate = useNavigate();
 	const goToProfile = () => {
@@ -48,6 +57,9 @@ function ProfileButton() {
 	);
 }
 
+/*
+This React component creates a leaderboard button, which routes to the leaderboard page.
+*/
 function LeaderboardButton() {
 	let navigate = useNavigate();
 	const goToLB = () => {
@@ -58,6 +70,12 @@ function LeaderboardButton() {
 	);
 }
 
+/*
+This React component creates a help button, which routes to the respective page for the given match type.
+If against a player, adds them to the queue.
+
+opponent - a string, the type of match to be played.
+*/
 function PlayButton({ opponent }) {
 	let navigate = useNavigate();
 
@@ -68,14 +86,7 @@ function PlayButton({ opponent }) {
 		else {
 			let name = getUsername();
 			socket.emit("queue", {name:name});
-			navigate('/lobby');
-	        /*axios.get('http://localhost:5000/api/queue/' + name)
-	        .then(() => {
-				navigate('/lobby');
-	        })
-	        .catch((err) => {
-					console.log(err);
-			});*/		
+			navigate('/lobby');	
 		}
 	}
 	return (
@@ -84,6 +95,12 @@ function PlayButton({ opponent }) {
 	);
 }
 
+/*
+This React component creates a logo for the home page.
+
+id - the ID to give the component.
+size - how big to make the image.
+*/
 function Logo({ id, size }) {
 	var style = {
 		backgroundImage: 'url(' + require('./images/othello_logo.png') + ')',
@@ -98,6 +115,11 @@ function Logo({ id, size }) {
 	);
 }
 
+/*
+This React component creates the sidebar of the home page.
+
+id - the ID to give the component
+*/
 function SidePanel({ id }) {
 	return (
 		<div id={id}>
@@ -110,6 +132,11 @@ function SidePanel({ id }) {
 	);
 }
 
+/*
+This React component creates the middle of the home page.
+
+id - the ID to give the component
+*/
 function MainHome({ id }) {
 	return (
 		<div id={id}>
@@ -125,6 +152,9 @@ function MainHome({ id }) {
 	);
 }
 
+/*
+This React component puts together the overall page layout.
+*/
 function Home() {
 	return (
 		<div id='Home'>

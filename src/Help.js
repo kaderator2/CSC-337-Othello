@@ -1,7 +1,17 @@
+/*
+ * CSC 337 - Final Project - Elijah Parent, Kade Dean, Andres Silva-Castellanos
+ * This file manages the help menu for the site, which displays instructions on how to play.
+ */
+
 import React from 'react';
 import {useNavigate} from "react-router-dom";
 import { Header, BackButton } from './Components';
 
+/*
+This function creates a return button, which routes to the home page.
+
+id - the ID to give the new button
+*/
 function ReturnButton({id}){
     let navigate = useNavigate();
     const goToHome = () => { 
@@ -12,6 +22,10 @@ function ReturnButton({id}){
 	);
 }
 
+/*
+This React function creates a component page, which was a back button, header, and gameplay
+instructions.
+*/
 function Help() {
     return (
         <div>
