@@ -238,37 +238,37 @@ router.route('/leave-room/:name').get((req, res) => {
 });
 
 /* Match data requests */
-router.route('/create-match').get(auth, (req, res) => {
+router.route('/create-match').get((req, res) => {
     console.log("match creating");
     createMatch(req, res);
 });
 
 /* Retrieves match state from ID */
-router.route('/match-state/:match_id').get(auth, (req, res) => {
+router.route('/match-state/:match_id').get((req, res) => {
     console.log("checking match state");
     matchState(req, res);
 });
 
 /* Retrieves board state from ID */
-router.route('/board-state/:board_id').get(auth, (req, res) => {
+router.route('/board-state/:board_id').get((req, res) => {
     console.log("checking board state");
     boardState(req, res);
 });
 
 /* Adds board state to a match with a specific ID */
-router.route('/add-board-state').post(auth, (req, res) => {
+router.route('/add-board-state').post((req, res) => {
     console.log("adding board state");
     addBoardState(req, res);
 });
 
 /* Updates the winner for a match with a specific ID */
-router.route('/update-winner').post(auth, (req, res) => {
+router.route('/update-winner').post((req, res) => {
     console.log("updating winner");
     updateWinner(req, res);
 });
 
 /* /* Updates the rating for a player with a specific ID */
-router.route("/change-user-rating").post(auth, (req, res) => {
+router.route("/change-user-rating").post((req, res) => {
     console.log('updating rating');
     updateRating(req, res);
 });
