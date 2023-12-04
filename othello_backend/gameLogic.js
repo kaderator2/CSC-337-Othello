@@ -1,4 +1,4 @@
-/**
+/*
  * CSC 337 - Final Project - Elijah Parent, Kade Dean, Andres Silva-Castellanos
  * This file contains the logic for the game. It is responsible for creating new matches, adding
  * board states to matches, getting board states from matches, and otherwise updating match
