@@ -439,32 +439,32 @@ function Board({ mode }) {
   }, []);
 
   useEffect(() => {
-	gameOver = false;
-    
+    gameOver = false;
+
     // uses structured cloning to copy the board state upon each opponent move
-	socket.on('opp_move', (res) => {
-	    if (toPlay !== playerSide) {
-	      setTimeout(() => {
-	        tempSquares = structuredClone(squares);
-	        if (checkMoveAllowed(res.row, res.col, true)) {
-	          if (currentBoardData) {
-	            axios.post('http://localhost:5000/api/add-board-state', {
-	              match: matchID,
-	              board: tempSquares,
-	              move: currentBoardData.moveNumber + 1,
-	              toMove: toPlay === 1 ? 2 : 1
-	            }).then((boardRes) => {
-	              toPlay = toPlay === 1 ? 2 : 1;
-	              if (checkGameEnd()) {
-	                endGame();
-	              }
-	            });
-	          }
-	        }
-	      }, 1000);
-	    }
-	});
-    
+    socket.on('opp_move', (res) => {
+      if (toPlay !== playerSide) {
+        setTimeout(() => {
+          tempSquares = structuredClone(squares);
+          if (checkMoveAllowed(res.row, res.col, true)) {
+            if (currentBoardData) {
+              axios.post('http://localhost:5000/api/add-board-state', {
+                match: matchID,
+                board: tempSquares,
+                move: currentBoardData.moveNumber + 1,
+                toMove: toPlay === 1 ? 2 : 1
+              }).then((boardRes) => {
+                toPlay = toPlay === 1 ? 2 : 1;
+                if (checkGameEnd()) {
+                  endGame();
+                }
+              });
+            }
+          }
+        }, 1000);
+      }
+    });
+
     // receive an alert if a user abandons match, remaining player wins
     socket.on("alert", (data) => {
       console.log("alert received");
@@ -529,12 +529,12 @@ function BackButtonMatch() {
 
 // Make a duplicate function of the one in Board so Timer and BackButtonMatch can access it
 function updateUserRating(result) {
-    var expected = 1 / (1 + Math.pow(10, (oppRef.current.data.rating - userRef.current.data.rating) / 400));
-    var newRating = Math.round(userRef.current.data.rating + 32 * (result - expected));
-    axios.post('http://localhost:5000/api/change-user-rating', {
-      username: getUsername(),
-      rating: newRating
-    });
+  var expected = 1 / (1 + Math.pow(10, (oppRef.current.data.rating - userRef.current.data.rating) / 400));
+  var newRating = Math.round(userRef.current.data.rating + 32 * (result - expected));
+  axios.post('http://localhost:5000/api/change-user-rating', {
+    username: getUsername(),
+    rating: newRating
+  });
 }
 
 /*
@@ -542,110 +542,113 @@ function updateUserRating(result) {
 * Turns last 1 minute and player forfeits on time running out
 */
 var toPlay;
-function Timer({mode}){
-	let navigate = useNavigate();
-	const Ref = useRef(null);
-	
-    // The timer state
-    const [timer, setTimer] = useState("00:00"); 
-    
-    /* if the player runs out of time, they abandon the match
-    if(timer === "00:00" && getToPlay() === getUsername()){
-		socket.emit("leave_room", { room: room, name: getUsername() });
-    	navigate('/home');
-	    if (!gameOver) {
-	      // if a player left the game before it was over, update the winner in the database and update the user ratings
-	      socket.emit("alert_opp", { room: room, user: getUsername() });	// update for remaining player
-	      axios.post('http://localhost:5000/api/update-winner', {		// update for abandoning player
-	        winner: oppName,
-	        matchID: matchID
-	      });
-	      updateUserRating(0);
-	    }
-	}*/
- 
- 	// Return the amount of time left on the timer in total, minutes, and seconds
-    const getTimeRemaining = (e) => {
-        const total = Date.parse(e) - Date.parse(new Date());
-        const seconds = Math.floor((total / 1000) % 60);
-        const minutes = Math.floor((total / 1000 / 60) % 60);
-        return {
-            total,
-            minutes,
-            seconds,
-        };
-    };
- 
- 	// Start the timer based on the time that is passed in (1 minute)
-    const startTimer = (e) => {
-        let { total, minutes, seconds } = getTimeRemaining(e);
-        if (total >= 0) {
-            setTimer(("0" + minutes) + ":" + (seconds > 9 ? seconds : "0" + seconds));
-        }
-    };
- 
- 	// clear the current timer and set another one for 1 minute
-    const clearTimer = (e) => {
-        setTimer("01:00");
- 
-        if (Ref.current)
-        	clearInterval(Ref.current);
-        const id = setInterval(() => {
-            startTimer(e);
-        }, 1000);
-        Ref.current = id;
-    };
- 
- 	// add time onto what was left of the timer
-    const getDeadTime = () => {
-        let deadline = new Date();
-        deadline.setSeconds(deadline.getSeconds() + 60);
-        return deadline;
-    };
+function Timer({ mode }) {
+  let navigate = useNavigate();
+  const Ref = useRef(null);
 
-    useEffect(() => {
-        clearTimer(getDeadTime());
-        toPlay = 1;
-        
-        // reset timer when socket sends the request after a player move
-        // also change display of whose turn it is
-	    socket.on("timer_reset", (data) => {
-			//console.log('received timer req in Match');
-			clearTimer(getDeadTime());
-			toPlay = toPlay === 1 ? 2 : 1;
-			document.getElementById('timerTurn').innerText = getToPlay() + ' turn';
-		});
-		
-		return () => {
-      		socket.off('timer_reset');
-    	};
-    }, []);
-    
-    // determine whose turn it is and return the name of that player
-    function getToPlay(){
-		//console.log("toPlay: " + toPlay + ", isClientP1: " + isClientP1);
-		if((toPlay === 1 && isClientP1) || (toPlay === 2 && !isClientP1))
-			return getUsername();		
-		else
-			return oppName;
-	}
-	// only display timer if it is PvP match
-	if(mode !== 'AI'){
-	    return (
-	    <div className='timerDiv'>
-	      <h3 id='timerTurn'> {getToPlay()} turn </h3> 
-	      <h3 id='timer'> {timer} </h3>
-	    </div>
-	  	);
-	}
+  // The timer state
+  const [timer, setTimer] = useState("00:00");
+
+  /* if the player runs out of time, they abandon the match
+  if(timer === "00:00" && getToPlay() === getUsername()){
+  socket.emit("leave_room", { room: room, name: getUsername() });
+    navigate('/home');
+    if (!gameOver) {
+      // if a player left the game before it was over, update the winner in the database and update the user ratings
+      socket.emit("alert_opp", { room: room, user: getUsername() });	// update for remaining player
+      axios.post('http://localhost:5000/api/update-winner', {		// update for abandoning player
+        winner: oppName,
+        matchID: matchID
+      });
+      updateUserRating(0);
+    }
+}*/
+
+  // Return the amount of time left on the timer in total, minutes, and seconds
+  const getTimeRemaining = (e) => {
+    const total = Date.parse(e) - Date.parse(new Date());
+    const seconds = Math.floor((total / 1000) % 60);
+    const minutes = Math.floor((total / 1000 / 60) % 60);
+    return {
+      total,
+      minutes,
+      seconds,
+    };
+  };
+
+  // Start the timer based on the time that is passed in (1 minute)
+  const startTimer = (e) => {
+    let { total, minutes, seconds } = getTimeRemaining(e);
+    if (total >= 0) {
+      setTimer(("0" + minutes) + ":" + (seconds > 9 ? seconds : "0" + seconds));
+    }
+  };
+
+  // clear the current timer and set another one for 1 minute
+  const clearTimer = (e) => {
+    setTimer("01:00");
+
+    if (Ref.current)
+      clearInterval(Ref.current);
+    const id = setInterval(() => {
+      startTimer(e);
+    }, 1000);
+    Ref.current = id;
+  };
+
+  // add time onto what was left of the timer
+  const getDeadTime = () => {
+    let deadline = new Date();
+    deadline.setSeconds(deadline.getSeconds() + 60);
+    return deadline;
+  };
+
+  useEffect(() => {
+    clearTimer(getDeadTime());
+    toPlay = 1;
+
+    // reset timer when socket sends the request after a player move
+    // also change display of whose turn it is
+    socket.on("timer_reset", (data) => {
+      //console.log('received timer req in Match');
+      clearTimer(getDeadTime());
+      toPlay = toPlay === 1 ? 2 : 1;
+      document.getElementById('timerTurn').innerText = getToPlay() + ' turn';
+    });
+
+    return () => {
+      socket.off('timer_reset');
+    };
+  }, []);
+
+  // determine whose turn it is and return the name of that player
+  function getToPlay() {
+    //console.log("toPlay: " + toPlay + ", isClientP1: " + isClientP1);
+    if ((toPlay === 1 && isClientP1) || (toPlay === 2 && !isClientP1))
+      return getUsername();
+    else
+      return oppName;
+  }
+  // only display timer if it is PvP match
+  if (mode !== 'AI') {
+    return (
+      <div className='timerDiv'>
+        <h3 id='timerTurn'> {getToPlay()} turn </h3>
+        <h3 id='timer'> {timer} </h3>
+      </div>
+    );
+  }
 }
 
+/*
+* This function returns the match page, which contains the board, timer, and back button
+*/
 function Match({ mode }) {
   return (
     <div>
       <BackButtonMatch />
       <Header value='Match' />
-      <Timer mode={mode} /> 
+      <Timer mode={mode} />
       <Board mode={mode} />
     </div>
   );
