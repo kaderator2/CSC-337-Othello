@@ -165,7 +165,7 @@ function Board({ mode }) {
   */
   function handleClick(row, col) {
     console.log("toPlay: " + toPlay + " playerSide: " + playerSide);
-    if (toPlay === playerSide) {
+    if (toPlay === playerSide && !gameOver) {
       //Check if the move is allowed
       tempSquares = structuredClone(squares);
       if (checkMoveAllowed(row, col, true)) {
@@ -547,22 +547,24 @@ function Timer({mode}){
 	const Ref = useRef(null);
 	
     // The timer state
-    const [timer, setTimer] = useState("00:00"); 
+    const [timer, setTimer] = useState("01:00"); 
     
-    /* if the player runs out of time, they abandon the match
+    // if the player runs out of time, they abandon the match
     if(timer === "00:00" && getToPlay() === getUsername()){
-		socket.emit("leave_room", { room: room, name: getUsername() });
-    	navigate('/home');
+		//socket.emit("leave_room", { room: room, name: getUsername() });
+    	//navigate('/home');
 	    if (!gameOver) {
-	      // if a player left the game before it was over, update the winner in the database and update the user ratings
+	      // if a player ran out of time before game over, update the winner in the database and update the user ratings
 	      socket.emit("alert_opp", { room: room, user: getUsername() });	// update for remaining player
 	      axios.post('http://localhost:5000/api/update-winner', {		// update for abandoning player
 	        winner: oppName,
 	        matchID: matchID
 	      });
+	      // set timer to max on game end
 	      updateUserRating(0);
+	      alert('You ran out of time! Game over.');
 	    }
-	}*/
+	}
  
  	// Return the amount of time left on the timer in total, minutes, and seconds
     const getTimeRemaining = (e) => {
