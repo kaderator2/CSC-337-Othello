@@ -1,10 +1,18 @@
+/*
+ * CSC 337 - Final Project - Elijah Parent, Kade Dean, Andres Silva-Castellanos
+ * This file contains several components that will be used in several files. To keep
+ * the project cleaner, they are just imported into the files that use them.
+ */
+
 import React from 'react';
 import { useNavigate } from "react-router-dom";
 import Cookies from 'universal-cookie';
 import io from "socket.io-client";
 
+// reference to the socket server
 export const socket = io.connect("http://localhost:3001");
 
+// Header of most all of the pages. 'value' is the text to be displayed depending on the page
 export function Header({ value }) {
     return (
         <div className='main_header'>
@@ -13,6 +21,7 @@ export function Header({ value }) {
     );
 }
 
+// A back button used to redirect users back to the Home page on click
 export function BackButton() {
     let navigate = useNavigate();
     const goToHome = () => {
@@ -26,17 +35,8 @@ export function BackButton() {
     );
 }
 
-export function NavButton({ path, value, id }) {
-    let navigate = useNavigate();
-    const goTo = () => {
-        let navTo = { path };
-        navigate({ navTo });
-    }
-    return (
-        <button id={id} className='navButton green_button fixed' onClick={goTo}> {value} </button>
-    );
-}
-
+// The profile picture of the user, and its container
+// Each declaration may give the PFP an id, a size, and the image to display
 export function ProfilePicture({ id, size, src }) {
     if (src) {
         var divStyles = {
@@ -59,6 +59,8 @@ export function ProfilePicture({ id, size, src }) {
     );
 }
 
+// A container containing a player's profile picture, name, and rating
+// These, plus an id, may be selected when used in other files
 export function PlayerData({ id, name, rating, pfp }) {
     return (
         <div id={id} className='player_data centered_container'>
@@ -73,7 +75,7 @@ export function PlayerData({ id, name, rating, pfp }) {
     );
 }
 
-// basic helper function to get username from cookies
+// A basic helper function to get username from cookies
 export function getUsername() {
     const cookies = new Cookies();
     let username = cookies.get('name');

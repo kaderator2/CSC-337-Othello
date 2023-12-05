@@ -26,6 +26,10 @@ var playerSide;
 const oppSide = playerSide === 1 ? 2 : 1;
 var oppName = '';
 
+/* 
+ When the socket notifies the client that a match has been found, set the player name
+ and the opponent name for the match, as well as the turns
+*/
 socket.on("found_match", (res) => {
   getUser = getUsername();
   let allPlayers = res.allPlayers;
@@ -138,7 +142,7 @@ function Board({ mode }) {
     }
     else {
       return new Promise((resolve, reject) => {
-        //Get data for the opponent if not AI
+        // Get data for the opponent if not AI
         axios.get('http://localhost:5000/api/get-user-data', {
           params: {
             name: oppName
@@ -169,7 +173,7 @@ function Board({ mode }) {
           move: move + 1,
           toMove: toPlay === 1 ? 2 : 1
         }).then((boardRes) => {
-          //Update the board
+          //Update the board (send the move to the opponent through the socket)
           socket.emit("player_move", { name: getUser, room: room, row: row, col: col });
           toPlay = toPlay === 1 ? 2 : 1;
           if (checkGameEnd()) {
@@ -195,7 +199,6 @@ function Board({ mode }) {
             }
             else if (mode === 'PVP') {
               console.log("waiting for opponent move");
-              // TODO implement timer
             }
           }
         });
@@ -512,7 +515,7 @@ function BackButtonMatch() {
     navigate('/home');
 
     if (!gameOver) {
-      // if the game is not over, update the winner in the database and update the user's rating
+      // if a player left the game before it was over, update the winner in the database and update the user ratings
       socket.emit("alert_opp", { room: room, user: getUsername() });	// update for remaining player
       axios.post('http://localhost:5000/api/update-winner', {		// update for abandoning player
         winner: oppName,
