@@ -1,7 +1,7 @@
 /*
  * CSC 337 - Final Project - Elijah Parent, Kade Dean, Andres Silva-Castellanos
- * This file contains the lobby page for the frontend. This page is used to
- * find a match.
+ * Lobby.js - This file contains the components for the Lobby page while players
+ * are waiting to be matched up.
  */
 
 import React from 'react';
@@ -11,11 +11,10 @@ import axios from 'axios';
 
 export var room;
 
-/* BackButton like in Components but leaves socket room and opponent wins match if match is left */
+/* BackButton like in Components.js but leaves the socket room too */
 export function BackButtonLobby() {
     let navigate = useNavigate();
 
-    // leave room and navigate to home
     const action = () => {
         socket.emit("leave_room", { room: room, name: getUsername() });
         navigate('/home');
@@ -28,13 +27,13 @@ export function BackButtonLobby() {
     );
 }
 
-// This component is used to render the lobby page.
+// The default component for this page (or the page itself, essentially)
 function Lobby() {
     let navigate = useNavigate();
 
-    // when the component mounts, find a match
+    // tell the socket that the current user has been matched
+    // put them into a room with one other player and direct them to the Match page
     socket.on("found_match", (obj) => {
-        // query to find the room
         let allPlayers = obj.allPlayers;
         let foundObj = allPlayers.find(obj => obj.p1.player === getUsername() || obj.p2.player === getUsername());
         room = foundObj.p1.room;

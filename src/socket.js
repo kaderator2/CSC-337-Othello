@@ -1,7 +1,7 @@
 /*
  * CSC 337 - Final Project - Elijah Parent, Kade Dean, Andres Silva-Castellanos
- * This file contains all the socket.io code for the backend. Handles
- * all the game related connections.
+ * socket.js - This file contains the connection of the socket.io server and all the
+ * communication actions between the socket and the other pages in the project
  */
 
 const express = require("express");
@@ -26,17 +26,17 @@ let queue = [];
 let playingArr = [];
 let roomNumber = 1;
 
-// on connection, handle all the events
+// Open all listneners when a user connects
 io.on("connection", (socket) => {
 	console.log(`User Connected: ${socket.id}`);
 
-	// handles users joining rooms
+	// Put the user into the given room
 	socket.on("join_room", (data) => {
 		console.log('Joined room ' + data);
 		socket.join(data);
 	});
 
-	// handles users leaving rooms
+	// Take the user out of the given room
 	socket.on("leave_room", (data) => {
 		console.log('Left room ' + data.room);
 		//let clients = io.sockets.adapter.rooms.get(data.room);
@@ -45,12 +45,13 @@ io.on("connection", (socket) => {
 		socket.leave(data.room);
 	});
 
-	// handles users disconnecting and alerts opponent
+	// If a user abandons a match, alert the other user
 	socket.on("alert_opp", (data) => {
 		io.to(data.room).emit('alert', data);
 	});
 
-	// handles users entering the queue
+	// Action to queue a user into matchmaking
+	// notify both users' clients that a match has been found
 	socket.on("queue", (user) => {
 		if (user.name != null) {
 			queue.push(user.name);
@@ -85,17 +86,20 @@ io.on("connection", (socket) => {
 		}
 	});
 
-	// handles users making a move
+	// take in a (row, col) player move, and send it to the other player
 	socket.on("player_move", (data) => {
-		//TODO send move only to other player
-		//let moved = data.name;
-		//let sendTo = moved === allRooms.room[0] ? allRooms.room[1] : allRooms.room[1];
 		let room = data.room;
 		io.to(room).emit('opp_move', { row: data.row, col: data.col });
+	});
+
+	// notify the client to reset the timer
+	socket.on("reset_timer", (room) => {
+		console.log('received timer req in socket, sending back...');
+		io.to(room).emit('timer_reset', room);
 	});
 });
 
 // start the server
 server.listen(3001, () => {
-	console.log("SERVER IS RUNNING");
+	console.log("SOCKET SERVER IS RUNNING");
 });

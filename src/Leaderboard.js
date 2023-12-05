@@ -1,17 +1,21 @@
 /*
  * CSC 337 - Final Project - Elijah Parent, Kade Dean, Andres Silva-Castellanos
- * This file contains all the socket.io code for the backend. Handles
- * all the game related connections.
+ * This file displays the top users by rating on the application.
  */
 
 import React, { useState, useEffect } from 'react';
 import { BackButton } from './Components';
 import axios from 'axios';
 
+/*
+  RankTable - The main component of the page / the actual table that displays the rankings
+  including rank, name, and rating.
+*/
 function RankTable({ list }) {
 	const [topTenPlayers, setTopTenPlayers] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
 
+	// send the request to get the top 10 players
 	useEffect(() => {
 		axios.get('http://localhost:5000/api/get-top-ten')
 			.then((res) => {
@@ -54,6 +58,7 @@ function RankTable({ list }) {
 	);
 }
 
+// Container component to be exported
 function Leaderboard() {
 	return (
 		<div>

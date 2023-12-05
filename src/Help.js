@@ -45,8 +45,9 @@ function Help() {
             as you can to your color to win the game! </p>
             <br></br>
             <h2> Ranking </h2>
-            <p className='text'> Gain rating points by winning matches against other players! Your total rating points are a way to show
-            your skill-level to other players. </p>
+            <p className='text'> Gain rating points by winning matches against other players! The amount of rating points gained or lost in a 
+            match depends on your rating vs your opponent's rating. If you abandon a match, you will forfeit the match and lose rating points. 
+            Your total rating points are a way to show your skill-level to other players! </p>
             <br></br>
             <h2> Match History </h2>
             <p className='text'> From the Home page, you can navigate to Match History to view your past matches played. From there, you can
