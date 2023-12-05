@@ -147,7 +147,8 @@ router.route("/get-match-history").get((req, res) => {
     // get username from request
     let username = req.query.username;
     // find all matches where the user is either player 1 or player 2
-    let p = Match.find({ $or: [{ player1Name: username }, { player2Name: username }] }).exec();
+    //let p = Match.find({ $or: [{ player1Name: username }, { player2Name: username }] }).exec();
+    let p = Match.find( { player1Name: username } ).exec();
     p.then((matches) => {
         if (matches) {
             console.log(matches);
@@ -238,7 +239,8 @@ router.route('/get-user-stats/:name').get(async (req, res) => {
         }
 
         const matchesPlayed = await Match.find({
-            $or: [{ player1Name: name }, { player2Name: name }],
+            //$or: [{ player1Name: name }, { player2Name: name }],
+            player1Name: name
         });
 
         const totalGamesPlayed = matchesPlayed.length;
