@@ -165,7 +165,7 @@ function Board({ mode }) {
   */
   function handleClick(row, col) {
     console.log("toPlay: " + toPlay + " playerSide: " + playerSide);
-    if (toPlay === playerSide) {
+    if (toPlay === playerSide && !gameOver) {
       //Check if the move is allowed
       tempSquares = structuredClone(squares);
       if (checkMoveAllowed(row, col, true)) {
@@ -542,66 +542,65 @@ function updateUserRating(result) {
 * Turns last 1 minute and player forfeits on time running out
 */
 var toPlay;
-function Timer({ mode }) {
-  let navigate = useNavigate();
-  const Ref = useRef(null);
-
-  // The timer state
-  const [timer, setTimer] = useState("00:00");
-
-  /* if the player runs out of time, they abandon the match
-  if(timer === "00:00" && getToPlay() === getUsername()){
-  socket.emit("leave_room", { room: room, name: getUsername() });
-    navigate('/home');
-    if (!gameOver) {
-      // if a player left the game before it was over, update the winner in the database and update the user ratings
-      socket.emit("alert_opp", { room: room, user: getUsername() });	// update for remaining player
-      axios.post('http://localhost:5000/api/update-winner', {		// update for abandoning player
-        winner: oppName,
-        matchID: matchID
-      });
-      updateUserRating(0);
-    }
-}*/
-
-  // Return the amount of time left on the timer in total, minutes, and seconds
-  const getTimeRemaining = (e) => {
-    const total = Date.parse(e) - Date.parse(new Date());
-    const seconds = Math.floor((total / 1000) % 60);
-    const minutes = Math.floor((total / 1000 / 60) % 60);
-    return {
-      total,
-      minutes,
-      seconds,
+function Timer({mode}){
+	const Ref = useRef(null);
+	
+    // The timer state
+    const [timer, setTimer] = useState("01:00"); 
+    
+    // if the player runs out of time, they abandon the match
+    if(timer === "00:00" && getToPlay() === getUsername()){
+	    if (!gameOver) {
+	      // if a player ran out of time before game over, update the winner in the database and update the user ratings
+	      socket.emit("alert_opp", { room: room, user: getUsername() });	// update for remaining player
+	      axios.post('http://localhost:5000/api/update-winner', {		// update for abandoning player
+	        winner: oppName,
+	        matchID: matchID
+	      });
+	      // set timer to max on game end
+	      updateUserRating(0);
+	      alert('You ran out of time! Game over.');
+	    }
+	}
+ 
+ 	// Return the amount of time left on the timer in total, minutes, and seconds
+    const getTimeRemaining = (e) => {
+        const total = Date.parse(e) - Date.parse(new Date());
+        const seconds = Math.floor((total / 1000) % 60);
+        const minutes = Math.floor((total / 1000 / 60) % 60);
+        return {
+            total,
+            minutes,
+            seconds,
+        };
     };
-  };
-
-  // Start the timer based on the time that is passed in (1 minute)
-  const startTimer = (e) => {
-    let { total, minutes, seconds } = getTimeRemaining(e);
-    if (total >= 0) {
-      setTimer(("0" + minutes) + ":" + (seconds > 9 ? seconds : "0" + seconds));
-    }
-  };
-
-  // clear the current timer and set another one for 1 minute
-  const clearTimer = (e) => {
-    setTimer("01:00");
-
-    if (Ref.current)
-      clearInterval(Ref.current);
-    const id = setInterval(() => {
-      startTimer(e);
-    }, 1000);
-    Ref.current = id;
-  };
-
-  // add time onto what was left of the timer
-  const getDeadTime = () => {
-    let deadline = new Date();
-    deadline.setSeconds(deadline.getSeconds() + 60);
-    return deadline;
-  };
+ 
+ 	// Start the timer based on the time that is passed in (1 minute)
+    const startTimer = (e) => {
+        let { total, minutes, seconds } = getTimeRemaining(e);
+        if (total >= 0) {
+            setTimer(("0" + minutes) + ":" + (seconds > 9 ? seconds : "0" + seconds));
+        }
+    };
+ 
+ 	// clear the current timer and set another one for 1 minute
+    const clearTimer = (e) => {
+        setTimer("01:00");
+ 
+        if (Ref.current)
+        	clearInterval(Ref.current);
+        const id = setInterval(() => {
+            startTimer(e);
+        }, 1000);
+        Ref.current = id;
+    };
+ 
+ 	// add time onto what was left of the timer
+    const getDeadTime = () => {
+        let deadline = new Date();
+        deadline.setSeconds(deadline.getSeconds() + 60);
+        return deadline;
+    };
 
   useEffect(() => {
     clearTimer(getDeadTime());
@@ -610,7 +609,6 @@ function Timer({ mode }) {
     // reset timer when socket sends the request after a player move
     // also change display of whose turn it is
     socket.on("timer_reset", (data) => {
-      //console.log('received timer req in Match');
       clearTimer(getDeadTime());
       toPlay = toPlay === 1 ? 2 : 1;
       document.getElementById('timerTurn').innerText = getToPlay() + ' turn';
@@ -623,7 +621,6 @@ function Timer({ mode }) {
 
   // determine whose turn it is and return the name of that player
   function getToPlay() {
-    //console.log("toPlay: " + toPlay + ", isClientP1: " + isClientP1);
     if ((toPlay === 1 && isClientP1) || (toPlay === 2 && !isClientP1))
       return getUsername();
     else
