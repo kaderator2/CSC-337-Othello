@@ -10,7 +10,6 @@ const { addBoardState, boardState, matchState, createMatch, updateWinner, update
 const auth = require("./auth");
 const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken");
-const fs = require('fs');
 
 var router = express.Router();
 
@@ -57,79 +56,6 @@ router.route("/add/user").post(async (req, res) => {
             error,
         });
     }
-});
-
-// route for adding a new pfp to the db
-router.route('/img_data')
-    .post(upload.single('file'), function (req, res) {
-        var new_img = new Img;
-        new_img.img.data = fs.readFileSync(req.file.path)
-        new_img.img.contentType = 'image/png';
-        new_img.save();
-        res.json({ message: 'New image added to the db!' });
-    })
-
-// (this is just a starter endpoint to get the ball rolling)
-// Sets up where to store POST images
-const storage = multer.diskStorage({
-    destination: function (req, res, cb) {
-        cb(null, 'uploads/')
-    }
-});
-
-const multer = require('multer');
-const upload = multer({ storage: storage });
-// Allows user to change their profile photo
-// uses fs for file system stuffs and saves it Users profile
-// uses multer to store the image in the uploads folder
-router.route("/change-profile-photo").post(auth, upload.single('file'), (req, res) => {
-    console.log("changing profile photo");
-    // get username from request
-    let username = req.body.username;
-    // get file path from request
-    let filePath = req.file.path;
-    // read the file
-    fs.readFileSync(filePath, (err, data) => {
-        if (err) {
-            console.log(err);
-            return res.status(500).send("Error uploading profile photo");
-        }
-        // save the file to the user
-        User.findOne({ username: username })
-            .then((user) => {
-                user.profilePhoto.data = data;
-                user.profilePhoto.contentType = 'image/png';
-                user.save()
-                    .then(() => {
-                        res.status(200).send("Profile photo uploaded successfully");
-                    })
-                    .catch((err) => {
-                        console.log(err);
-                        res.status(500).send("Error uploading profile photo");
-                    });
-            })
-            .catch((err) => {
-                console.log(err);
-                res.status(500).send("Error uploading profile photo");
-            });
-    });
-});
-
-// this function servers the profile photo to the client
-router.route("/get-profile-photo").get((req, res) => {
-    // get username from request
-    let username = req.query.username;
-    // find the user
-    User.findOne({ username: username })
-        .then((user) => {
-            // send the profile photo
-            res.contentType(user.profilePhoto.contentType);
-            res.send(user.profilePhoto.data);
-        })
-        .catch((err) => {
-            console.log(err);
-            res.status(500).send("Error getting profile photo");
-        });
 });
 
 // login endpoint
