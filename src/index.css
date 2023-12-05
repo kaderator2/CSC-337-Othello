@@ -28,9 +28,16 @@ code {
   background-color: #2c302d;
   padding-top: 2vh;
   padding-bottom: 2vh;
+  position: fixed;
+  width: 100%;
+  top: 0;
+  z-index: 0;
+  /* Ensure header is on top */
 }
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   color: #8df0c2;
   ;
 }
@@ -235,13 +242,14 @@ label {
   bottom: 10px;
 }
 
-.timerDive, #timer {
-	text-align: "center";
-	margin: 0px;
+.timerDive,
+#timer {
+  text-align: "center";
+  margin: 0px;
 }
 
-#timerTurn{
-	margin-bottom: 5px;
+#timerTurn {
+  margin-bottom: 5px;
 }
 
 /* styling for Home */
@@ -282,7 +290,10 @@ label {
   background-color: rgb(34, 40, 38);
   position: fixed;
   right: 0;
-  top: 12.8vh;
+  bottom: 0;
+  top: calc(2vh + 5px);
+  z-index: -1;
+  padding-top: 10vh;
 }
 
 #logoutButton {
@@ -308,7 +319,7 @@ label {
   background-repeat: no-repeat;
   background-position: center center;
   background-size: contain;
-  translate: 0px -70px;
+  translate: 0px 10vh;
 }
 
 #profileButton {

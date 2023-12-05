@@ -118,19 +118,6 @@ function Replay({ matchData }) {
     );
 }
 
-// this function contains the code for the profile picture button
-// which allows users to upload and change their profile picture
-function changeProfilePhotoButton() {
-    const goToChangeProfilePhoto = () => {
-        console.log("change profile photo button pressed");
-    }
-    return (
-        <div className='replay centered_container'>
-            <button onClick={goToChangeProfilePhoto}>Change Profile Photo</button>
-        </div>
-    );
-}
-
 /*
 This component is used to render the profile page.
 */
@@ -141,7 +128,6 @@ function Profile() {
             <BackButton />
             <Header value='Profile' />
             <ProfilePicture id="homePFP" size="150px" />  {/* Temp size and src */}
-            <changeProfilePhotoButton />
             <PlayerSection />
             <ReplaySection />
         </div>

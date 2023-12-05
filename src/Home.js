@@ -126,14 +126,73 @@ This React component creates the sidebar of the home page.
 
 id - the ID to give the component
 */
+//function SidePanel({ id }) {
+//	return (
+//		<div id={id}>
+//			<ProfilePicture id="homePFP" size="150px" />  {/* Temp size and src */}
+//			<br></br>
+//			<ProfileButton />
+//			<br></br>
+//			<LogoutButton />
+//		</div>
+//	);
+//}
+
 function SidePanel({ id }) {
+	const [playerStats, setPlayerStats] = React.useState(null); // State to store player stats
+
+	React.useEffect(() => {
+		// Fetch player stats
+		axios.get('YOUR_ENDPOINT_TO_GET_PLAYER_STATS')
+			.then((response) => {
+				// Assuming the response contains player stats data
+				setPlayerStats(response.data);
+			})
+			.catch((error) => {
+				console.error('Error fetching player stats:', error);
+			});
+	}, []);
+
+	let navigate = useNavigate();
+	const cookies = new Cookies();
+
+	const goToProfile = () => {
+		navigate('/profile');
+	};
+
+	const goToLogin = () => {
+		const goToLogin = () => {
+			// Sends get request to logout
+			axios.get('http://localhost:5000/api/logout/')
+				.then((res) => {
+					console.log("Logged out!");
+					cookies.remove('TOKEN');
+					cookies.remove('name');
+					navigate('/');
+				}).catch((err) => {
+					console.log("Error logging out");
+					console.log(err);
+				});
+		}
+	};
+
 	return (
 		<div id={id}>
-			<ProfilePicture id="homePFP" size="150px" />  {/* Temp size and src */}
-			<br></br>
-			<ProfileButton />
-			<br></br>
-			<LogoutButton />
+			<div>
+				<h3>Welcome, {getUsername()}!</h3> {/* Display user's name */}
+				{playerStats && (
+					<div>
+						{/* Display player stats */}
+						<p>Wins: {playerStats.wins}</p>
+						<p>Losses: {playerStats.losses}</p>
+						{/* Add more stats as needed */}
+					</div>
+				)}
+			</div>
+			<br />
+			<button id="profileButton" className='green_button fixed' onClick={goToProfile}> Profile </button>
+			<br />
+			<button id="logoutButton" className='green_button fixed' onClick={goToLogin}> Log out </button>
 		</div>
 	);
 }
