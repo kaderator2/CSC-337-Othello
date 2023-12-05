@@ -224,6 +224,52 @@ router.route('/leave-room/:name').get((req, res) => {
         })
 });
 
+
+/* Endpoint to return user statistics */
+router.route('/get-user-stats/:name').get(async (req, res) => {
+    const name = req.params.name;
+    console.log(name);
+
+    try {
+        const user = await User.findOne({ username: name });
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        const matchesPlayed = await Match.find({
+            $or: [{ player1Name: name }, { player2Name: name }],
+        });
+
+        const totalGamesPlayed = matchesPlayed.length;
+        const gamesWon = matchesPlayed.filter(
+            (match) => match.winner === name
+        ).length;
+
+        let lastGamePlayed = 'No games played yet';
+        if (totalGamesPlayed > 0) {
+            const lastMatch = matchesPlayed[totalGamesPlayed - 1];
+            lastGamePlayed = lastMatch ? lastMatch._id : lastGamePlayed;
+        }
+
+        const winPercentage =
+            totalGamesPlayed > 0 ? ((gamesWon / totalGamesPlayed) * 100).toFixed(2) : 0;
+
+        const userStats = {
+            lastGamePlayed,
+            totalGamesPlayed,
+            gamesWon,
+            winPercentage,
+        };
+
+        res.status(200).json(userStats);
+    } catch (error) {
+        console.error('Error retrieving user stats:', error);
+        res.status(500).json({ message: 'Error retrieving user stats', error });
+    }
+});
+
+
 /* Match data requests */
 router.route('/create-match').get((req, res) => {
     console.log("match creating");

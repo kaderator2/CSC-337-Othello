@@ -26,10 +26,6 @@ const UserSchema = new Schema({
     password: String,
     rating: Number,
     room: Number,
-    profilePhoto: {
-        data: Buffer,
-        contentType: String,
-    },
 });
 
 var Board = mongoose.model('Board', BoardSchema);

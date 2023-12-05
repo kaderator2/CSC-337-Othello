@@ -53,15 +53,15 @@ function LogoutButton() {
 /*
 This React component creates a profile button, which routes to the profile page.
 */
-function ProfileButton() {
-	let navigate = useNavigate();
-	const goToProfile = () => {
-		navigate('/profile');
-	}
-	return (
-		<button id="profileButton" className='green_button fixed' onClick={goToProfile}> Profile </button>
-	);
-}
+//function ProfileButton() {
+//	let navigate = useNavigate();
+//	const goToProfile = () => {
+//		navigate('/profile');
+//	}
+//	return (
+//		<button id="profileButton" className='green_button fixed' onClick={goToProfile}> Profile </button>
+//	);
+//}
 
 /*
 This React component creates a leaderboard button, which routes to the leaderboard page.
@@ -143,7 +143,7 @@ function SidePanel({ id }) {
 
 	React.useEffect(() => {
 		// Fetch player stats
-		axios.get('YOUR_ENDPOINT_TO_GET_PLAYER_STATS')
+		axios.get('http://localhost:5000/api/get-user-stats/' + getUsername())
 			.then((response) => {
 				// Assuming the response contains player stats data
 				setPlayerStats(response.data);
@@ -161,19 +161,18 @@ function SidePanel({ id }) {
 	};
 
 	const goToLogin = () => {
-		const goToLogin = () => {
-			// Sends get request to logout
-			axios.get('http://localhost:5000/api/logout/')
-				.then((res) => {
-					console.log("Logged out!");
-					cookies.remove('TOKEN');
-					cookies.remove('name');
-					navigate('/');
-				}).catch((err) => {
-					console.log("Error logging out");
-					console.log(err);
-				});
-		}
+		// Sends get request to logout
+		axios.get('http://localhost:5000/api/logout/')
+			.then((res) => {
+				console.log("Logged out!");
+				cookies.remove('TOKEN');
+				cookies.remove('name');
+				navigate('/');
+			}).catch((err) => {
+				console.log("Error logging out");
+				console.log(err);
+			});
+
 	};
 
 	return (
@@ -183,8 +182,8 @@ function SidePanel({ id }) {
 				{playerStats && (
 					<div>
 						{/* Display player stats */}
-						<p>Wins: {playerStats.wins}</p>
-						<p>Losses: {playerStats.losses}</p>
+						<p>Wins: {playerStats.gamesWon}</p>
+						<p>Losses: {playerStats.totalGamesPlayed - playerStats.gamesWon}</p>
 						{/* Add more stats as needed */}
 					</div>
 				)}
