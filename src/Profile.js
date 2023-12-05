@@ -13,7 +13,12 @@ import axios from 'axios';
 function PlayerSection() {
     // state variables for the player section
     const [rating, setRating] = useState('?');
-    const [matchTotal, setMatchTotal] = useState('?');
+    const [playerStats, setPlayerStats] = React.useState({
+        lastGamePlayed: "No games played yet",
+        totalGamesPlayed: 0,
+        gamesWon: 0,
+        winPercentage: 0
+    }); // State to store player stats
 
     useEffect(() => {
         //Get data for the current user
@@ -26,14 +31,15 @@ function PlayerSection() {
             setRating(user.data.rating);
         });
 
-        axios.get('http://localhost:5000/api/get-match-history', {
-            params: {
-                username: getUsername()
-            }
-        }).then((matches) => {
-            console.log(matches.data);
-            setMatchTotal(matches.data.length);
-        });
+        // Fetch player stats
+        axios.get('http://localhost:5000/api/get-user-stats/' + getUsername())
+            .then((response) => {
+                // Assuming the response contains player stats data
+                setPlayerStats(response.data);
+            })
+            .catch((error) => {
+                console.error('Error fetching player stats:', error);
+            });
     }, []);
 
     return (
@@ -42,7 +48,10 @@ function PlayerSection() {
             <h3 id='player_name'>{getUsername()}</h3>
             <div id='player_details_container' className='centered_container'>
                 <p id='player_rating' className='player_details centered_section'><b>Rating:</b> {rating}</p>
-                <p id='matches_played' className='player_details centered_section'><b>Matches played:</b> {matchTotal}</p>
+                <p id='matches_played' className='player_details centered_section'><b>Matches played:</b> {playerStats.totalGamesPlayed}</p>
+                <p id='matches_played' className='player_details centered_section'><b>Wins:</b> {playerStats.gamesWon}</p>
+                <p id='matches_played' className='player_details centered_section'><b>Losses:</b> {playerStats.totalGamesPlayed - playerStats.gamesWon}</p>
+
             </div>
         </div>
     );
@@ -127,7 +136,6 @@ function Profile() {
         <div>
             <BackButton />
             <Header value='Profile' />
-            <ProfilePicture id="homePFP" size="150px" />  {/* Temp size and src */}
             <PlayerSection />
             <ReplaySection />
         </div>
