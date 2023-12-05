@@ -11,7 +11,6 @@ const auth = require("./auth");
 const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken");
 
-
 var router = express.Router();
 
 // Receives the request to add a user to the database
@@ -58,7 +57,6 @@ router.route("/add/user").post(async (req, res) => {
         });
     }
 });
-
 
 // login endpoint
 router.route("/login").post((req, res) => {
@@ -170,26 +168,15 @@ router.route("/get-top-ten").get((req, res) => {
 
 // Get user data by username
 router.route("/get-user-data").get((req, res) => {
-    let p = User.findOne({username: req.query.name}).exec();
+    let p = User.findOne({ username: req.query.name }).exec();
     p.then((user) => {
         console.log(user);
         res.status(200).send(user);
     })
-    .catch((err) => {console.log(err);});
+        .catch((err) => { console.log(err); });
 });
 
-// (this is just a starter endpoint to get the ball rolling)
-// Allows user to change their profile photo
-router.route("/change-profile-photo").post(auth, (req, res) => {
-    // get username and profile photo from request
-    let username = req.body.username;
-    let profilePhoto = req.body.profilePhoto;
-    // find user and update profile photo
-    let p = User.findOneAndUpdate({ username: username }, { profilePhoto: profilePhoto }).exec();
-    p.then(() => {
-        res.status(200).send("Profile photo updated successfully");
-    });
-});
+
 
 /* Queue up the player with the given name */
 let queue = [];
@@ -197,45 +184,91 @@ let roomNumber = 1;
 router.route('/queue/:name').get((req, res) => {
     let name = req.query.name;
     User.findOne({ username: name })
-    .then((user) => {
-		queue.push(user);
-		res.status(200).send("SUCESS");
-    })
+        .then((user) => {
+            queue.push(user);
+            res.status(200).send("SUCESS");
+        })
 });
 
 /* Match players when there are 2 in the queue, return room number
    of the player passed in as a parameter */
 router.route('/check-queue/:name').get((req, res) => {
-	let name = req.params.name;
-	//console.log("Q length: " + queue.length);
-    if(queue.length >= 2){
-		queue[0].room = roomNumber;
-		queue[1].room = roomNumber;
-		queue[0].save().then(() => {
-			queue[1].save().then(() => {
-				queue.splice(0,2);
-				roomNumber++;
-			}).catch((err) => {console.log(err);});
-        }).catch((err) => {console.log(err);});
-	}
-	User.findOne({ username: name })
-    .then((user) => {
-		res.status(200).send(''+(user.room));	// send as String
-    });
+    let name = req.params.name;
+    //console.log("Q length: " + queue.length);
+    if (queue.length >= 2) {
+        queue[0].room = roomNumber;
+        queue[1].room = roomNumber;
+        queue[0].save().then(() => {
+            queue[1].save().then(() => {
+                queue.splice(0, 2);
+                roomNumber++;
+            }).catch((err) => { console.log(err); });
+        }).catch((err) => { console.log(err); });
+    }
+    User.findOne({ username: name })
+        .then((user) => {
+            res.status(200).send('' + (user.room));	// send as String
+        });
 });
 
 /* Remove player from room and room from User */
 router.route('/leave-room/:name').get((req, res) => {
     let name = req.params.name;
     User.findOne({ username: name })
-    .then((user) => {
-		queue.splice(queue.indexOf(user), 1);
-        user.room = 0;
-        user.save().then(() => {
-    		res.status(200).send(''+roomNumber);	// send as String
-        }).catch((err) => { console.log(err); });
-    })
+        .then((user) => {
+            queue.splice(queue.indexOf(user), 1);
+            user.room = 0;
+            user.save().then(() => {
+                res.status(200).send('' + roomNumber);	// send as String
+            }).catch((err) => { console.log(err); });
+        })
 });
+
+
+/* Endpoint to return user statistics */
+router.route('/get-user-stats/:name').get(async (req, res) => {
+    const name = req.params.name;
+    console.log(name);
+
+    try {
+        const user = await User.findOne({ username: name });
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        const matchesPlayed = await Match.find({
+            $or: [{ player1Name: name }, { player2Name: name }],
+        });
+
+        const totalGamesPlayed = matchesPlayed.length;
+        const gamesWon = matchesPlayed.filter(
+            (match) => match.winner === name
+        ).length;
+
+        let lastGamePlayed = 'No games played yet';
+        if (totalGamesPlayed > 0) {
+            const lastMatch = matchesPlayed[totalGamesPlayed - 1];
+            lastGamePlayed = lastMatch ? lastMatch._id : lastGamePlayed;
+        }
+
+        const winPercentage =
+            totalGamesPlayed > 0 ? ((gamesWon / totalGamesPlayed) * 100).toFixed(2) : 0;
+
+        const userStats = {
+            lastGamePlayed,
+            totalGamesPlayed,
+            gamesWon,
+            winPercentage,
+        };
+
+        res.status(200).json(userStats);
+    } catch (error) {
+        console.error('Error retrieving user stats:', error);
+        res.status(500).json({ message: 'Error retrieving user stats', error });
+    }
+});
+
 
 /* Match data requests */
 router.route('/create-match').get((req, res) => {

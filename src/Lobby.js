@@ -6,18 +6,18 @@
 
 import React from 'react';
 import { Header, getUsername, socket } from './Components';
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 
 export var room;
 
 /* BackButton like in Components.js but leaves the socket room too */
-export function BackButtonLobby(){
-	let navigate = useNavigate();
-  	
+export function BackButtonLobby() {
+    let navigate = useNavigate();
+
     const action = () => {
-		socket.emit("leave_room", {room:room, name:getUsername()});
-		navigate('/home');
+        socket.emit("leave_room", { room: room, name: getUsername() });
+        navigate('/home');
     }
 
     return (
@@ -29,18 +29,18 @@ export function BackButtonLobby(){
 
 // The default component for this page (or the page itself, essentially)
 function Lobby() {
-	let navigate = useNavigate();
-	
-	// tell the socket that the current user has been matched
-	// put them into a room with one other player and direct them to the Match page
-	socket.on("found_match", (obj) => {
-		let allPlayers = obj.allPlayers;
-		let foundObj = allPlayers.find(obj => obj.p1.player === getUsername() || obj.p2.player === getUsername());
-		room = foundObj.p1.room;
-		socket.emit("join_room", room);
-		navigate('/match/pvp'); 	
-	});
-	
+    let navigate = useNavigate();
+
+    // tell the socket that the current user has been matched
+    // put them into a room with one other player and direct them to the Match page
+    socket.on("found_match", (obj) => {
+        let allPlayers = obj.allPlayers;
+        let foundObj = allPlayers.find(obj => obj.p1.player === getUsername() || obj.p2.player === getUsername());
+        room = foundObj.p1.room;
+        socket.emit("join_room", room);
+        navigate('/match/pvp');
+    });
+
     return (
         <div>
             <BackButtonLobby />

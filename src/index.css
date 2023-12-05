@@ -30,7 +30,9 @@ code {
   padding-bottom: 2vh;
 }
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   color: #8df0c2;
   ;
 }
@@ -235,13 +237,14 @@ label {
   bottom: 10px;
 }
 
-.timerDive, #timer {
-	text-align: "center";
-	margin: 0px;
+.timerDive,
+#timer {
+  text-align: "center";
+  margin: 0px;
 }
 
-#timerTurn{
-	margin-bottom: 5px;
+#timerTurn {
+  margin-bottom: 5px;
 }
 
 /* styling for Home */
@@ -278,11 +281,11 @@ label {
   float: right;
   display: block;
   width: 25%;
-  height: 100%;
+  height: 88vh;
   background-color: rgb(34, 40, 38);
   position: fixed;
   right: 0;
-  top: 12.8vh;
+  bottom: 0;
 }
 
 #logoutButton {

@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { useState, useEffect, useRef } from 'react';
-import Default, { Header, BackButton, getUsername } from './Components'
+import Default, { Header, BackButton, getUsername, ProfilePicture } from './Components'
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 
@@ -122,10 +122,12 @@ function Replay({ matchData }) {
 This component is used to render the profile page.
 */
 function Profile() {
+
     return (
         <div>
             <BackButton />
             <Header value='Profile' />
+            <ProfilePicture id="homePFP" size="150px" />  {/* Temp size and src */}
             <PlayerSection />
             <ReplaySection />
         </div>
