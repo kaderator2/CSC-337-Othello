@@ -281,13 +281,11 @@ label {
   float: right;
   display: block;
   width: 25%;
-  height: 100vh;
+  height: 88vh;
   background-color: rgb(34, 40, 38);
   position: fixed;
   right: 0;
   bottom: 0;
-  z-index: -1;
-  padding-top: 20vh;
 }
 
 #logoutButton {
