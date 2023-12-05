@@ -91,6 +91,12 @@ io.on("connection", (socket) => {
     	let room = data.room;
     	io.to(room).emit('opp_move', {row : data.row, col : data.col});
   	});
+  	
+  	// notify the client to reset the timer
+  	socket.on("reset_timer", (room) => {
+		console.log('received timer req in socket, sending back...');
+		io.to(room).emit('timer_reset', room);	  
+	});
 });
 
 server.listen(3001, () => {

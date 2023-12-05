@@ -235,6 +235,15 @@ label {
   bottom: 10px;
 }
 
+.timerDive, #timer {
+	text-align: "center";
+	margin: 0px;
+}
+
+#timerTurn{
+	margin-bottom: 5px;
+}
+
 /* styling for Home */
 
 #mainHome {
