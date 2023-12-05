@@ -10,7 +10,7 @@ const { addBoardState, boardState, matchState, createMatch, updateWinner, update
 const auth = require("./auth");
 const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken");
-
+const fs = require('fs');
 
 var router = express.Router();
 
@@ -59,6 +59,78 @@ router.route("/add/user").post(async (req, res) => {
     }
 });
 
+// route for adding a new pfp to the db
+router.route('/img_data')
+    .post(upload.single('file'), function (req, res) {
+        var new_img = new Img;
+        new_img.img.data = fs.readFileSync(req.file.path)
+        new_img.img.contentType = 'image/png';
+        new_img.save();
+        res.json({ message: 'New image added to the db!' });
+    })
+
+// (this is just a starter endpoint to get the ball rolling)
+// Sets up where to store POST images
+const storage = multer.diskStorage({
+    destination: function (req, res, cb) {
+        cb(null, 'uploads/')
+    }
+});
+
+const multer = require('multer');
+const upload = multer({ storage: storage });
+// Allows user to change their profile photo
+// uses fs for file system stuffs and saves it Users profile
+// uses multer to store the image in the uploads folder
+router.route("/change-profile-photo").post(auth, upload.single('file'), (req, res) => {
+    console.log("changing profile photo");
+    // get username from request
+    let username = req.body.username;
+    // get file path from request
+    let filePath = req.file.path;
+    // read the file
+    fs.readFileSync(filePath, (err, data) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).send("Error uploading profile photo");
+        }
+        // save the file to the user
+        User.findOne({ username: username })
+            .then((user) => {
+                user.profilePhoto.data = data;
+                user.profilePhoto.contentType = 'image/png';
+                user.save()
+                    .then(() => {
+                        res.status(200).send("Profile photo uploaded successfully");
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                        res.status(500).send("Error uploading profile photo");
+                    });
+            })
+            .catch((err) => {
+                console.log(err);
+                res.status(500).send("Error uploading profile photo");
+            });
+    });
+});
+
+// this function servers the profile photo to the client
+router.route("/get-profile-photo").get((req, res) => {
+    // get username from request
+    let username = req.query.username;
+    // find the user
+    User.findOne({ username: username })
+        .then((user) => {
+            // send the profile photo
+            res.contentType(user.profilePhoto.contentType);
+            res.send(user.profilePhoto.data);
+        })
+        .catch((err) => {
+            console.log(err);
+            res.status(500).send("Error getting profile photo");
+        });
+});
 
 // login endpoint
 router.route("/login").post((req, res) => {
@@ -170,26 +242,15 @@ router.route("/get-top-ten").get((req, res) => {
 
 // Get user data by username
 router.route("/get-user-data").get((req, res) => {
-    let p = User.findOne({username: req.query.name}).exec();
+    let p = User.findOne({ username: req.query.name }).exec();
     p.then((user) => {
         console.log(user);
         res.status(200).send(user);
     })
-    .catch((err) => {console.log(err);});
+        .catch((err) => { console.log(err); });
 });
 
-// (this is just a starter endpoint to get the ball rolling)
-// Allows user to change their profile photo
-router.route("/change-profile-photo").post(auth, (req, res) => {
-    // get username and profile photo from request
-    let username = req.body.username;
-    let profilePhoto = req.body.profilePhoto;
-    // find user and update profile photo
-    let p = User.findOneAndUpdate({ username: username }, { profilePhoto: profilePhoto }).exec();
-    p.then(() => {
-        res.status(200).send("Profile photo updated successfully");
-    });
-});
+
 
 /* Queue up the player with the given name */
 let queue = [];
@@ -197,44 +258,44 @@ let roomNumber = 1;
 router.route('/queue/:name').get((req, res) => {
     let name = req.query.name;
     User.findOne({ username: name })
-    .then((user) => {
-		queue.push(user);
-		res.status(200).send("SUCESS");
-    })
+        .then((user) => {
+            queue.push(user);
+            res.status(200).send("SUCESS");
+        })
 });
 
 /* Match players when there are 2 in the queue, return room number
    of the player passed in as a parameter */
 router.route('/check-queue/:name').get((req, res) => {
-	let name = req.params.name;
-	//console.log("Q length: " + queue.length);
-    if(queue.length >= 2){
-		queue[0].room = roomNumber;
-		queue[1].room = roomNumber;
-		queue[0].save().then(() => {
-			queue[1].save().then(() => {
-				queue.splice(0,2);
-				roomNumber++;
-			}).catch((err) => {console.log(err);});
-        }).catch((err) => {console.log(err);});
-	}
-	User.findOne({ username: name })
-    .then((user) => {
-		res.status(200).send(''+(user.room));	// send as String
-    });
+    let name = req.params.name;
+    //console.log("Q length: " + queue.length);
+    if (queue.length >= 2) {
+        queue[0].room = roomNumber;
+        queue[1].room = roomNumber;
+        queue[0].save().then(() => {
+            queue[1].save().then(() => {
+                queue.splice(0, 2);
+                roomNumber++;
+            }).catch((err) => { console.log(err); });
+        }).catch((err) => { console.log(err); });
+    }
+    User.findOne({ username: name })
+        .then((user) => {
+            res.status(200).send('' + (user.room));	// send as String
+        });
 });
 
 /* Remove player from room and room from User */
 router.route('/leave-room/:name').get((req, res) => {
     let name = req.params.name;
     User.findOne({ username: name })
-    .then((user) => {
-		queue.splice(queue.indexOf(user), 1);
-        user.room = 0;
-        user.save().then(() => {
-    		res.status(200).send(''+roomNumber);	// send as String
-        }).catch((err) => { console.log(err); });
-    })
+        .then((user) => {
+            queue.splice(queue.indexOf(user), 1);
+            user.room = 0;
+            user.save().then(() => {
+                res.status(200).send('' + roomNumber);	// send as String
+            }).catch((err) => { console.log(err); });
+        })
 });
 
 /* Match data requests */

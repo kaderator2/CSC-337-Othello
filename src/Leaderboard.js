@@ -1,3 +1,9 @@
+/*
+ * CSC 337 - Final Project - Elijah Parent, Kade Dean, Andres Silva-Castellanos
+ * This file contains all the socket.io code for the backend. Handles
+ * all the game related connections.
+ */
+
 import React, { useState, useEffect } from 'react';
 import { BackButton } from './Components';
 import axios from 'axios';

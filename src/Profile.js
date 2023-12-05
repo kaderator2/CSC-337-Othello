@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { useState, useEffect, useRef } from 'react';
-import Default, { Header, BackButton, getUsername } from './Components'
+import Default, { Header, BackButton, getUsername, ProfilePicture } from './Components'
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 
@@ -118,14 +118,30 @@ function Replay({ matchData }) {
     );
 }
 
+// this function contains the code for the profile picture button
+// which allows users to upload and change their profile picture
+function changeProfilePhotoButton() {
+    const goToChangeProfilePhoto = () => {
+        console.log("change profile photo button pressed");
+    }
+    return (
+        <div className='replay centered_container'>
+            <button onClick={goToChangeProfilePhoto}>Change Profile Photo</button>
+        </div>
+    );
+}
+
 /*
 This component is used to render the profile page.
 */
 function Profile() {
+
     return (
         <div>
             <BackButton />
             <Header value='Profile' />
+            <ProfilePicture id="homePFP" size="150px" />  {/* Temp size and src */}
+            <changeProfilePhotoButton />
             <PlayerSection />
             <ReplaySection />
         </div>

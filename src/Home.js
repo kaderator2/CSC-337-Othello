@@ -91,8 +91,8 @@ function PlayButton({ opponent }) {
 		}
 		else {
 			let name = getUsername();
-			socket.emit("queue", {name:name});
-			navigate('/lobby');	
+			socket.emit("queue", { name: name });
+			navigate('/lobby');
 		}
 	}
 	return (

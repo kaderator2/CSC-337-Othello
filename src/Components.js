@@ -53,9 +53,10 @@ export function ProfilePicture({ id, size, src }) {
         };
     }
 
+
     return (
         <div className='match_pfp image_contain centered_section'
-            style={divStyles} id={id}></div>
+            style={divStyles} id={id} ></div>
     );
 }
 
