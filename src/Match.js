@@ -316,14 +316,14 @@ function Board({ mode }) {
       // the winner is player 2, update the winner in the database and update the user's rating
       if (playerSide === 2) {
         axios.post('http://localhost:5000/api/update-winner', {
-          winner: oppName,
+          winner: getUsername(),
           matchID: matchID
         });
         updateUserRating(1);
       }
       else {
         axios.post('http://localhost:5000/api/update-winner', {
-          winner: getUsername(),
+          winner: oppName,
           matchID: matchID
         });
         updateUserRating(0);
